@@ -40,7 +40,7 @@ const Home: NextPage = () => {
               <p>
                 Experiment with{" "}
                 <Link href="/example-ui" passHref className="link">
-                  Example UI
+                   UI
                 </Link>{" "}
                 to build your own UI.
               </p>

@@ -21,17 +21,17 @@ export const ContractData = () => {
   const greetingRef = useRef<HTMLDivElement>(null);
 
   const { data: totalCounter } = useScaffoldContractRead({
-    contractName: "YourContract",
+    contractName: "P2PEscrow",
     functionName: "totalCounter",
   });
 
   const { data: currentGreeting, isLoading: isGreetingLoading } = useScaffoldContractRead({
-    contractName: "YourContract",
+    contractName: "P2PEscrow",
     functionName: "greeting",
   });
 
   useScaffoldEventSubscriber({
-    contractName: "YourContract",
+    contractName: "P2PEscrow",
     eventName: "GreetingChange",
     listener: logs => {
       logs.map(log => {
@@ -46,7 +46,7 @@ export const ContractData = () => {
     isLoading: isLoadingEvents,
     error: errorReadingEvents,
   } = useScaffoldEventHistory({
-    contractName: "YourContract",
+    contractName: "P2PEscrow",
     eventName: "GreetingChange",
     fromBlock: process.env.NEXT_PUBLIC_DEPLOY_BLOCK ? BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK) : 0n,
     filters: { greetingSetter: address },
@@ -77,50 +77,8 @@ export const ContractData = () => {
           showAnimation ? "animate-zoom" : ""
         }`}
       >
-        <div className="flex justify-between w-full">
-          <button
-            className="btn btn-circle btn-ghost relative bg-center bg-[url('/assets/switch-button-on.png')] bg-no-repeat"
-            onClick={() => {
-              setTransitionEnabled(!transitionEnabled);
-            }}
-          >
-            <div
-              className={`absolute inset-0 bg-center bg-no-repeat bg-[url('/assets/switch-button-off.png')] transition-opacity ${
-                transitionEnabled ? "opacity-0" : "opacity-100"
-              }`}
-            />
-          </button>
-          <div className="bg-secondary border border-primary rounded-xl flex">
-            <div className="p-2 py-1 border-r border-primary flex items-end">Total count</div>
-            <div className="text-4xl text-right min-w-[3rem] px-2 py-1 flex justify-end font-bai-jamjuree">
-              {totalCounter?.toString() || "0"}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-3 border border-primary bg-neutral rounded-3xl text-secondary  overflow-hidden text-[116px] whitespace-nowrap w-full uppercase tracking-tighter font-bai-jamjuree leading-tight">
-          <div className="relative overflow-x-hidden" ref={containerRef}>
-            {/* for speed calculating purposes */}
-            <div className="absolute -left-[9999rem]" ref={greetingRef}>
-              <div className="px-4">{currentGreeting}</div>
-            </div>
-            {new Array(3).fill("").map((_, i) => {
-              const isLineRightDirection = i % 2 ? isRightDirection : !isRightDirection;
-              return (
-                <Marquee
-                  key={i}
-                  direction={isLineRightDirection ? "right" : "left"}
-                  gradient={false}
-                  play={showTransition}
-                  speed={marqueeSpeed}
-                  className={i % 2 ? "-my-10" : ""}
-                >
-                  <div className="px-4">{currentGreeting || " "}</div>
-                </Marquee>
-              );
-            })}
-          </div>
-        </div>
+    
+        
 
         <div className="mt-3 flex items-end justify-between">
           <button

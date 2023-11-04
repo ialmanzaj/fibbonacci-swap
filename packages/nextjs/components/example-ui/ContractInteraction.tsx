@@ -10,7 +10,7 @@ export const ContractInteraction = () => {
   const [newGreeting, setNewGreeting] = useState("");
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
-    contractName: "YourContract",
+    contractName: "P2PEscrow",
     functionName: "setGreeting",
     args: [newGreeting],
     value: "0.01",
@@ -20,68 +20,82 @@ export const ContractInteraction = () => {
   });
 
   return (
-    <div className="flex bg-base-300 relative pb-10">
-      <DiamondIcon className="absolute top-24" />
-      <CopyIcon className="absolute bottom-0 left-36" />
-      <HareIcon className="absolute right-0 bottom-24" />
+    <div className="flex relative pb-10 bg-gray-800 ">
       <div className="flex flex-col w-full mx-5 sm:mx-8 2xl:mx-20">
-        <div className={`mt-10 flex gap-2 ${visible ? "" : "invisible"} max-w-2xl`}>
-          <div className="flex gap-5 bg-base-200 bg-opacity-80 z-0 p-7 rounded-2xl shadow-lg">
-            <span className="text-3xl">👋🏻</span>
-            <div>
-              <div>
-                In this page you can see how some of our <strong>hooks & components</strong> work, and how you can bring
-                them to life with your own design! Have fun and try it out!
-              </div>
-              <div className="mt-2">
-                Check out{" "}
-                <code className="italic bg-base-300 text-base font-bold [word-spacing:-0.5rem]">
-                  packages / nextjs/pages / example-ui.tsx
-                </code>{" "}
-                and its underlying components.
-              </div>
-            </div>
-          </div>
-          <button
-            className="btn btn-circle btn-ghost h-6 w-6 bg-base-200 bg-opacity-80 z-0 min-h-0 drop-shadow-md"
-            onClick={() => setVisible(false)}
-          >
-            <XMarkIcon className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="flex flex-col mt-6 px-7 py-8 bg-base-200 opacity-80 rounded-2xl shadow-lg border-2 border-primary">
-          <span className="text-4xl sm:text-6xl text-black">Set a Greeting_</span>
-
-          <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5">
-            <input
-              type="text"
-              placeholder="Write your greeting here"
-              className="input font-bai-jamjuree w-full px-5 bg-[url('/assets/gradient-bg.png')] bg-[length:100%_100%] border border-primary text-lg sm:text-2xl placeholder-white uppercase"
-              onChange={e => setNewGreeting(e.target.value)}
-            />
-            <div className="flex rounded-full border border-primary p-1 flex-shrink-0">
-              <div className="flex rounded-full border-2 border-primary p-1">
-                <button
-                  className={`btn btn-primary rounded-full capitalize font-normal font-white w-24 flex items-center gap-1 hover:gap-2 transition-all tracking-widest ${
-                    isLoading ? "loading" : ""
-                  }`}
-                  onClick={() => writeAsync()}
-                >
-                  {!isLoading && (
-                    <>
-                      Send <ArrowSmallRightIcon className="w-3 h-3 mt-0.5" />
-                    </>
-                  )}
+        <div className="flex flex-col h-screen bg-gray-900">
+          <main className="flex-1 p-6 overflow-auto">
+            <div className="max-w-2xl mx-auto bg-gray-700 rounded-lg shadow-2xl p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">P2P</h1>
+              <div className="flex justify-start space-x-4 mb-4">
+                <button className="inline-flex items-center justify-center text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 bg-transparent text-white rounded-lg shadow-2xl p-3">
+                  Buy
+                </button>
+                <button className="inline-flex items-center justify-center text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 bg-transparent text-white rounded-lg shadow-2xl p-3">
+                  Sell
                 </button>
               </div>
+              <form className="space-y-4">
+                <div className="flex flex-col space-y-2 bg-gray-800 rounded-lg p-3">
+                  <label className="font-medium text-gray-300">You send</label>
+                  <div className="flex justify-between">
+                    <input
+                      className="flex h-10 w-full border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800 text-white rounded-lg border-none focus:border-transparent flex-grow"
+                      placeholder="0.0"
+                      type="number"
+                    />
+                    <div className="relative flex-grow-0">
+                      <button className="inline-flex items-center justify-center text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-pink-500 text-white rounded-full w-full shadow-2xl p-4 focus:outline-none hover:bg-pink-500">
+                        Select Token
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={24}
+                          height={24}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className=" ml-2"
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2 bg-gray-800 rounded-lg p-3">
+                  <label className="font-medium text-gray-300">You receive</label>
+                  <div className="flex justify-between">
+                    <input
+                      className="flex h-10 w-full border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800 text-white rounded-lg border-none focus:border-transparent flex-grow"
+                      placeholder="0.0"
+                      type="number"
+                    />
+                    <div className="relative flex-grow-0">
+                      <button className="inline-flex items-center justify-center text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-pink-500 text-white rounded-full w-full shadow-2xl p-4 focus:outline-none hover:bg-pink-500">
+                        Select Token
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={24}
+                          height={24}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className=" ml-2"
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
-          </div>
-
-          <div className="mt-4 flex gap-2 items-start">
-            <span className="text-sm leading-tight">Price:</span>
-            <div className="badge badge-warning">0.01 ETH + Gas</div>
-          </div>
+          </main>
         </div>
       </div>
     </div>
