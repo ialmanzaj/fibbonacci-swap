@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @title
  * @notice
  */
-contract P2PEscrow is ResultsConsumer, AutomationCompatibleInterface {
+contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
     /// @notice Mapping of game IDs to escrows data
     mapping(uint256 => Escrow) public escrows;
 
