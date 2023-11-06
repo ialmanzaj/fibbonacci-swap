@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "forge-std/console.sol";
 import {ResultsConsumer} from "./ResultsConsumer.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -9,11 +10,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @title
  * @notice
  */
-contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
-    /// @notice Mapping of game IDs to escrows data
+contract P2PEscrow is ResultsConsumer, AutomationCompatibleInterface {
+    /// @notice Mapping of escrow IDs to escrows data
     mapping(uint256 => Escrow) public escrows;
 
-    /// @notice Mapping of game IDs to Chainlink Functions request IDs
+    /// @notice Mapping of escrow IDs to Chainlink Functions request IDs
     mapping(uint256 => bytes32) private pendingRequests;
     uint256[] private activeEscrows;
 
@@ -33,7 +34,7 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         uint256 amount; // amount in custody
         uint256 amountToBuy; // amount buyer wants
         IERC20 currency; // currency in custody
-        uint256 startedAt; // The timestamp of the game start time
+        uint256 startedAt; // The timestamp of the escrow start time
         EscrowStatus status;
     }
 
@@ -61,11 +62,16 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
 
     // CONSTRUCTOR
 
-    constructor(address _router, bytes32 _donId) ResultsConsumer(_router, _donId) {}
+    constructor(address _router) ResultsConsumer(_router) {}
 
     // ACTIONS
 
-    function deposit(uint256 _orderId, string memory _makerUniqueId, uint256 _amount) external {
+    function updateEscrow(uint256 _orderId, string memory linkId, string memory _accountId) external onlyOwner {
+        escrows[_orderId].taker.linkId = linkId;
+        escrows[_orderId].taker.accountId = _accountId;
+    }
+
+    function deposit(uint256 _orderId, string memory _makerId, uint256 _amount) public {
         if (escrows[_orderId].status == EscrowStatus.ACTIVE) {
             revert Escrow__IsAlreadyActive();
         }
@@ -75,12 +81,12 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         }
 
         //transfer stablecoin to contract
-        // _currency.safeTransferFrom(msg.sender, address(this), _amount);
+        //_token.safeTransferFrom(msg.sender, address(this), _amount);
 
         escrows[_orderId] = Escrow(
             block.timestamp, // timestamp created
             _orderId, // the current orderId
-            Actor(payable(msg.sender), _makerUniqueId, "", ""), // maker
+            Actor(payable(msg.sender), _makerId, "", ""), // maker
             Actor(payable(address(0)), "", "", ""), // taker
             _amount, // amount in custody
             0, //
@@ -93,9 +99,7 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         emit EscrowDeposited(_orderId, escrows[_orderId]);
     }
 
-    function accept(uint256 _orderId, uint256 _amount, string memory _takerLinkId, string memory _takerAccountId)
-        external
-    {
+    function accept(uint256 _orderId, uint256 _amount, string memory _linkId, string memory _accountId) external {
         if (escrows[_orderId].taker.wallet == msg.sender) {
             revert Escrow__BuyerCannotBeSameAsSeller();
         }
@@ -104,12 +108,12 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
             revert Escrow__IsAlreadyActive();
         }
 
-        // Add the game to the active games list
+        // Add the escrow to the active escrows list
         activeEscrows.push(_orderId);
 
         // set taker data
-        escrows[_orderId].taker.linkId = _takerLinkId;
-        escrows[_orderId].taker.accountId = _takerAccountId;
+        escrows[_orderId].taker.linkId = _linkId;
+        escrows[_orderId].taker.accountId = _accountId;
         escrows[_orderId].taker.wallet = payable(msg.sender);
         escrows[_orderId].amountToBuy = _amount;
 
@@ -120,37 +124,26 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         emit EscrowAccepted(_orderId, escrows[_orderId]);
     }
 
-    function release(uint256 _orderId, uint256 _amount) private {
-        //escrows[_orderId].currency.safeTransfer(escrows[_orderId].taker, _amount);
-        emit EscrowReleased(_orderId, escrows[_orderId]);
-    }
-
-    /// @notice Get the data of a game
-    /// @param orderId The ID of the game
+    /// @notice Get the data of a escrow
+    /// @param orderId The ID of the escrow
     function getEscrow(uint256 orderId) external view returns (Escrow memory) {
         return escrows[orderId];
     }
 
-    /// @notice Request the result of a game from the external sports API
-    /// @param orderId The ID of the game
+    /// @notice Request the result of a escrow from the external fintech API
+    /// @param orderId The ID of the escrow
     /// @dev Uses Chainlink Functions via the ResultsConsumer contract
     function _requestResolve(uint256 orderId) internal {
         Escrow memory escrow = escrows[orderId];
 
-        // Request the result of the game via ResultsConsumer contract
+        // Request the result of the escrow via ResultsConsumer contract
         // Store the Chainlink Functions request ID to prevent duplicate requests
-        pendingRequests[orderId] = _requestResult(
-            orderId,
-            escrow.taker.linkId,
-            escrow.taker.accountId,
-            escrow.maker.userUniqueId,
-            escrow.amountToBuy,
-            escrow.startedAt
-        );
+        pendingRequests[orderId] =
+            _requestResult(orderId, escrow.taker.linkId, escrow.taker.accountId, escrow.maker.userUniqueId);
     }
 
-    /// @notice Get the data of all active games
-    /// @return activeEscrowsArray An array of all active games data
+    /// @notice Get the data of all active escrows
+    /// @return activeEscrowsArray An array of all active escrows data
     function getActiveEscrows() public view returns (Escrow[] memory) {
         Escrow[] memory activeEscrowsArray = new Escrow[](activeEscrows.length);
         for (uint256 i = 0; i < activeEscrows.length; i++) {
@@ -159,85 +152,64 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         return activeEscrowsArray;
     }
 
-    /// @notice Remove a game from the active games list
-    /// @param orderId The ID of the game
-    function _removeFromActiveEscrows(uint256 orderId) internal {
-        uint256 index;
-        for (uint256 i = 0; i < activeEscrows.length; i++) {
-            if (activeEscrows[i] == orderId) {
-                index = i;
-                break;
-            }
-        }
-        for (uint256 i = index; i < activeEscrows.length - 1; i++) {
-            activeEscrows[i] = activeEscrows[i + 1];
-        }
-        activeEscrows.pop();
-    }
-
-    /// @notice Process the result of a game from the external sports API
+    /// @notice Process the result of a escrow from the external fintech API
     /// @param orderId The ID of the sport
-    /// @param response The result of the game
+    /// @param response The result of the escrow
     /// @dev Called back by the ResultsConsumer contract when the result is received
     function _processResult(uint256 orderId, bytes memory response) internal override {
-        (uint256 amount, uint256 hasSentFiat) = abi.decode(response, (uint256, uint256));
+        //(uint256 amount, uint256 hasSentFiat) = abi.decode(response, (uint256, uint256));
 
-        if (hasSentFiat == 1) release(orderId, amount);
+        // if (hasSentFiat == 1) release(orderId, amount);
 
-        // _resolveGame(gameId, result);
+        _release(orderId);
     }
 
-    /// @notice Resolve a game with a final result
-    /// @param gameId The ID of the game
-    /// @param result The result of the game
-    /// @dev Removes the game from the active games list
-    /* function _resolveGame(uint256 gameId, Result result) internal {
-        // Store the game result and mark the game as finished
-        games[gameId].result = result;
-        games[gameId].resolved = true;
+    // @notice Resolve a escrow with a final result
+    function _release(uint256 _orderId) private {
+        // update escrow data
+        escrows[_orderId].status = EscrowStatus.COMPLETED;
 
-        // Add the game to the finished games list
-        resolvedGames.push(gameId);
-        _removeFromActiveGames(gameId);
+        //escrows[_orderId].currency.safeTransfer(escrows[_orderId].taker, _amount);
+        emit EscrowReleased(_orderId, escrows[_orderId]);
+    }
 
-        emit GameResolved(gameId, result);
+    /* function _resolveGame(uint256 escrowId, Result result) internal {
+        // Store the escrow result and mark the escrow as finished
+        escrows[escrowId].result = result;
+        escrows[escrowId].resolved = true;
+        // Add the escrow to the finished escrows list
+        resolvedGames.push(escrowId);
+        _removeFromActiveGames(escrowId);
+        emit GameResolved(escrowId, result);
     } */
 
-    /// @notice Check if a game is ready to be resolved
-    /// @param orderId The ID of the game
-    /// @return ready Whether or not the game is ready to be resolved
-    /// @dev The game must be registered and not resolved
-    /// @dev Used by Chainlink Automation to determine if a game result should be requested
+    /// @notice Check if a escrow is ready to be resolved
+    /// @param orderId The ID of the escrow
+    /// @return ready Whether or not the escrow is ready to be resolved
+    /// @dev The escrow must be registered and not resolved
+    /// @dev Used by Chainlink Automation to determine if a escrow result should be requested
     function readyToResolve(uint256 orderId) public view returns (bool) {
         return escrows[orderId].status == EscrowStatus.ACTIVE;
     }
 
     // CHAINLINK AUTOMATION
 
-    /// @notice Check if any games are ready to be resolved
-    /// @dev Called by Chainlink Automation to determine if a game result should be requested
+    /// @notice Check if any escrows are ready to be resolved
+    /// @dev Called by Chainlink Automation to determine if a escrow result should be requested
     function checkUpkeep(bytes memory) public view override returns (bool, bytes memory) {
-        /* // Get all games that can be resolved
-        Escrow[] memory _activeEscrows = getActiveEscrows();
-        // Check if any game is ready to be resolved and have not already been requested
-        for (uint256 i = 0; i < _activeEscrows.length; i++) {
-            uint256 orderId = _activeEscrows[i].orderId;
+        // Get all escrows that can be resolved
+        for (uint256 i = 0; i < activeEscrows.length; i++) {
+            uint256 orderId = activeEscrows[i];
             if (readyToResolve(orderId)) {
-                // Signal that a game is ready to be resolved to Chainlink Automation
+                // Signal that a escrow is ready to be resolved to Chainlink Automation
                 return (true, abi.encodePacked(orderId));
             }
-        } */
-        Escrow[] memory _activeEscrows = getActiveEscrows();
-        uint256 orderId = _activeEscrows[0].orderId;
-        if (readyToResolve(orderId)) {
-            // Signal that a game is ready to be resolved to Chainlink Automation
-            return (true, abi.encodePacked(orderId));
         }
         return (false, "");
     }
 
-    /// @notice Request the result of a game
-    /// @dev Called back by Chainlink Automation when a game is ready to be resolved
+    /// @notice Request the result of a escrow
+    /// @dev Called back by Chainlink Automation when a escrow is ready to be resolved
     function performUpkeep(bytes calldata data) external override {
         uint256 orderId = abi.decode(data, (uint256));
         _requestResolve(orderId);
@@ -245,8 +217,8 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
 
     // OWNER
 
-    /// @notice Delete a failed Chainlink Functions request to restart the game resolve process
-    /// @param orderId The ID of the game
+    /// @notice Delete a failed Chainlink Functions request to restart the escrow resolve process
+    /// @param orderId The ID of the escrow
     /// @dev Manual intervention required or the automation will retry indefinitely
     function deletePendingRequest(uint256 orderId) external onlyOwner {
         delete pendingRequests[orderId];

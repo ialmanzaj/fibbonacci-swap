@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "forge-std/console.sol";
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
@@ -53,37 +54,27 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
     // CONSTRUCTOR
 
     /// @notice Initializes the contract
-    /// @param _router The address of the Chainlink Function router
-    /// @param _donId The new job ID to be set
-    constructor(address _router, bytes32 _donId) FunctionsClient(_router) ConfirmedOwner(msg.sender) {
-        donId = _donId;
-    }
+
+    constructor(address _router) FunctionsClient(_router) ConfirmedOwner(msg.sender) {}
 
     // INTERNAL
 
-    /// @notice Requests a fintech result
-    /// @param orderId The ID of the sport
-    /// @param takerLinkId The link ID of the buyer
-    /// @param takerAccountId The account ID of the buyer
-    /// @param makerId The ID of the sell
-    /// @param amountToBuy The amount to buy
-    /// @param startedAt The started datetime of the escrow
-    /// @return requestId The Chainlink Functions request ID
+    /// @notice Requests a fintech API result
     function _requestResult(
         uint256 orderId,
-        string memory takerLinkId,
-        string memory takerAccountId,
-        string memory makerId,
-        uint256 amountToBuy,
-        uint256 startedAt
+        //uint256 amount,
+        //uint256 startedAt,
+        string memory linkId,
+        string memory accountId,
+        string memory makerId
     ) internal returns (bytes32 requestId) {
         // Prepare the arguments for the Chainlink Functions request
         string[] memory args = new string[](5);
-        args[0] = takerLinkId;
-        args[1] = takerAccountId;
+        args[0] = linkId;
+        args[1] = accountId;
         args[2] = makerId;
-        args[3] = Strings.toString(amountToBuy);
-        args[4] = Strings.toString(startedAt);
+        //args[3] = Strings.toString(amount);
+        //args[4] = Strings.toString(startedAt);
 
         // Send the Chainlink Functions request
         requestId = _executeRequest(args);
@@ -119,19 +110,21 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
         string memory _source,
         bytes memory _encryptedSecretsUrls,
         uint64 _subscriptionId,
-        uint32 _gasLimit
+        uint32 _gasLimit,
+        bytes32 _donId
     ) external onlyOwner {
         source = _source;
         encryptedSecretsUrls = _encryptedSecretsUrls;
         subscriptionId = _subscriptionId;
         gasLimit = _gasLimit;
+        donId = _donId;
     }
 
     /// @notice Update the request secrets in DON settings
-    /* function updateSecretsDon(int8 _donHostedSecretsSlotID, uint64 _donHostedSecretsVersion) external onlyOwner {
+    function updateSecretsDon(uint8 _donHostedSecretsSlotID, uint64 _donHostedSecretsVersion) external onlyOwner {
         donHostedSecretsSlotID = _donHostedSecretsSlotID;
         donHostedSecretsVersion = _donHostedSecretsVersion;
-    } */
+    }
 
     /// @notice Processes the result of a fintech API request
     /// @param orderId The ID of the sport
