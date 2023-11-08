@@ -138,10 +138,9 @@ export const ContractInteraction = () => {
                     />
                   </div>
                   <div className="flex min-w-max flex-col items-end justify-between gap-4 text-left overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => createWidget(true)}
-                      className="text-white h-10 rounded-[20px] p-[6px] border-[#D2D2D7] dark:border-[#343534] bg-light-action-gradient bg-dark-action-gradient border-[2px] overflow-hidden transition-all dark:hover:bg-button-main-gradient hover:bg-[#555] hover:bg-gray-200 relative mb-1 flex items-center transition-colors "
+                    <div
+                      
+                      className="text-white h-10 rounded-[20px] p-[6px] border-[#D2D2D7] dark:border-[#343534] bg-light-action-gradient bg-dark-action-gradient border-[2px] overflow-hidden transition-all dark:hover:bg-button-main-gradient hover:bg-[#555] hover:bg-gray-200 relative mb-1 flex items-center transition-colors  "
                       data-testid="button-сhoose-from-token"
                     >
                       <div className="relative">
@@ -149,11 +148,11 @@ export const ContractInteraction = () => {
                           width={28}
                           height={28}
                           className="mr-2 rounded-full"
-                          src="https://wise.com/web-art/assets/flags/cop.svg"
-                          alt="USD Coin"
+                          src="https://cdn.via.exchange/tokens/USDT.svg"
+                          alt="USDT Coin"
                           style={{ borderWidth: "1.2px" }}
                         />
-                        {/* <img
+                        {/*  <img
                           width={18}
                           height={18}
                           className="absolute left-4 rounded -top-[2px]"
@@ -166,8 +165,8 @@ export const ContractInteraction = () => {
                           }}
                         /> */}
                       </div>
-                      <span className="font-semibold overflow-hidden text-ellipsis md:max-w-[130px] text-sm">COP</span>
-                      <svg
+                      <span className="font-semibold overflow-hidden text-ellipsis md:max-w-[130px] text-sm px-1">USDT</span>
+                      {/* <svg
                         width={24}
                         height={24}
                         viewBox="0 0 18 18"
@@ -182,8 +181,8 @@ export const ContractInteraction = () => {
                           d="M12.1553 6.98964C11.8624 6.67012 11.3876 6.67012 11.0947 6.98964L9 9.27473L6.90533 6.98964C6.61244 6.67012 6.13756 6.67012 5.84467 6.98964C5.55178 7.30916 5.55178 7.8272 5.84467 8.14672L8.46967 11.0104C8.76256 11.3299 9.23744 11.3299 9.53033 11.0104L12.1553 8.14672C12.4482 7.8272 12.4482 7.30916 12.1553 6.98964Z"
                           fill="currentColor"
                         />
-                      </svg>
-                    </button>
+                      </svg> */}
+                    </div>
                     <span className="text-sm dark:text-white-400 leading-none text-[#9ca3af]">
                       <span className="dark:text-white/80 text-[#141418CC] font-semibold"></span>
                       <button type="button" className="test-sm ml-1 rounded-lg px-1 leading-none uppercase">
@@ -239,9 +238,10 @@ export const ContractInteraction = () => {
                     />
                   </div>
                   <div className="flex min-w-max flex-col items-end justify-between gap-4 text-left overflow-hidden">
-                    <button
-                      type="button"
-                      className="text-white h-10 rounded-[20px] p-[6px] border-[#D2D2D7] dark:border-[#343534] bg-light-action-gradient dark:bg-dark-action-gradient border-[2px] overflow-hidden transition-all dark:hover:bg-button-main-gradient hover:bg-[#555] hover:bg-gray-200 relative mb-1 flex items-center transition-colors "
+                    <div
+                    
+              
+                      className="text-white h-10 rounded-[20px] p-[6px] border-[#D2D2D7] dark:border-[#343534] bg-light-action-gradient bg-dark-action-gradient border-[2px] overflow-hidden transition-all dark:hover:bg-button-main-gradient hover:bg-[#555] hover:bg-gray-200 relative mb-1 flex items-center transition-colors "
                       data-testid="button-сhoose-from-token"
                     >
                       <div className="relative">
@@ -249,11 +249,11 @@ export const ContractInteraction = () => {
                           width={28}
                           height={28}
                           className="mr-2 rounded-full"
-                          src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
+                          src="https://wise.com/web-art/assets/flags/cop.svg"
                           alt="USD Coin"
                           style={{ borderWidth: "1.2px" }}
                         />
-                        {/*  <img
+                        {/* <img
                           width={18}
                           height={18}
                           className="absolute left-4 rounded -top-[2px]"
@@ -266,8 +266,8 @@ export const ContractInteraction = () => {
                           }}
                         /> */}
                       </div>
-                      <span className="font-semibold overflow-hidden text-ellipsis md:max-w-[130px] text-sm">USDC</span>
-                      <svg
+                      <span className="font-semibold overflow-hidden text-ellipsis md:max-w-[130px] text-sm px-1">COP</span>
+                      {/* <svg
                         width={24}
                         height={24}
                         viewBox="0 0 18 18"
@@ -282,8 +282,8 @@ export const ContractInteraction = () => {
                           d="M12.1553 6.98964C11.8624 6.67012 11.3876 6.67012 11.0947 6.98964L9 9.27473L6.90533 6.98964C6.61244 6.67012 6.13756 6.67012 5.84467 6.98964C5.55178 7.30916 5.55178 7.8272 5.84467 8.14672L8.46967 11.0104C8.76256 11.3299 9.23744 11.3299 9.53033 11.0104L12.1553 8.14672C12.4482 7.8272 12.4482 7.30916 12.1553 6.98964Z"
                           fill="currentColor"
                         />
-                      </svg>
-                    </button>
+                      </svg> */}
+                    </div>
                   </div>
                 </div>
               </div>
