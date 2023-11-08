@@ -5,7 +5,7 @@ const contracts = {
       chainId: "31337",
       contracts: {
         Balloons: {
-          address: "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
+          address: "0x998abeb3E57409262aE5b751f60747921B33613E",
           abi: [
             {
               inputs: [
@@ -291,7 +291,7 @@ const contracts = {
           ],
         },
         P2PEscrowConsumer: {
-          address: "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+          address: "0x70e0bA845a1A0F2DA3359C97E0285013525FFC49",
           abi: [
             {
               inputs: [
@@ -299,11 +299,6 @@ const contracts = {
                   internalType: "address",
                   name: "_router",
                   type: "address",
-                },
-                {
-                  internalType: "bytes32",
-                  name: "_donId",
-                  type: "bytes32",
                 },
               ],
               stateMutability: "nonpayable",
@@ -845,12 +840,12 @@ const contracts = {
                 },
                 {
                   internalType: "string",
-                  name: "_takerLinkId",
+                  name: "_linkId",
                   type: "string",
                 },
                 {
                   internalType: "string",
-                  name: "_takerAccountId",
+                  name: "_accountId",
                   type: "string",
                 },
               ],
@@ -862,6 +857,34 @@ const contracts = {
             {
               inputs: [],
               name: "acceptOwnership",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "_orderId",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "_amount",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "_deadline",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "_makerId",
+                  type: "string",
+                },
+              ],
+              name: "addOffer",
               outputs: [],
               stateMutability: "nonpayable",
               type: "function",
@@ -899,29 +922,6 @@ const contracts = {
                 },
               ],
               name: "deletePendingRequest",
-              outputs: [],
-              stateMutability: "nonpayable",
-              type: "function",
-            },
-            {
-              inputs: [
-                {
-                  internalType: "uint256",
-                  name: "_orderId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "string",
-                  name: "_makerUniqueId",
-                  type: "string",
-                },
-                {
-                  internalType: "uint256",
-                  name: "_amount",
-                  type: "uint256",
-                },
-              ],
-              name: "deposit",
               outputs: [],
               stateMutability: "nonpayable",
               type: "function",
@@ -1359,8 +1359,31 @@ const contracts = {
                   name: "_gasLimit",
                   type: "uint32",
                 },
+                {
+                  internalType: "bytes32",
+                  name: "_donId",
+                  type: "bytes32",
+                },
               ],
               name: "updateRequest",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint8",
+                  name: "_donHostedSecretsSlotID",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint64",
+                  name: "_donHostedSecretsVersion",
+                  type: "uint64",
+                },
+              ],
+              name: "updateSecretsDon",
               outputs: [],
               stateMutability: "nonpayable",
               type: "function",

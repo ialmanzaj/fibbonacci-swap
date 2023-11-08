@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @title
  * @notice
  */
-contract P2PEscrow is ResultsConsumer, AutomationCompatibleInterface {
+contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
     /// @notice Mapping of escrow IDs to escrows data
     mapping(uint256 => Escrow) public escrows;
 
@@ -66,12 +66,7 @@ contract P2PEscrow is ResultsConsumer, AutomationCompatibleInterface {
 
     // ACTIONS
 
-    function updateEscrow(uint256 _orderId, string memory linkId, string memory _accountId) external onlyOwner {
-        escrows[_orderId].taker.linkId = linkId;
-        escrows[_orderId].taker.accountId = _accountId;
-    }
-
-    function deposit(uint256 _orderId, string memory _makerId, uint256 _amount) public {
+    function addOffer(uint256 _orderId, uint256 _amount, uint256 _deadline, string memory _makerId) public {
         if (escrows[_orderId].status == EscrowStatus.ACTIVE) {
             revert Escrow__IsAlreadyActive();
         }
@@ -172,16 +167,6 @@ contract P2PEscrow is ResultsConsumer, AutomationCompatibleInterface {
         //escrows[_orderId].currency.safeTransfer(escrows[_orderId].taker, _amount);
         emit EscrowReleased(_orderId, escrows[_orderId]);
     }
-
-    /* function _resolveGame(uint256 escrowId, Result result) internal {
-        // Store the escrow result and mark the escrow as finished
-        escrows[escrowId].result = result;
-        escrows[escrowId].resolved = true;
-        // Add the escrow to the finished escrows list
-        resolvedGames.push(escrowId);
-        _removeFromActiveGames(escrowId);
-        emit GameResolved(escrowId, result);
-    } */
 
     /// @notice Check if a escrow is ready to be resolved
     /// @param orderId The ID of the escrow

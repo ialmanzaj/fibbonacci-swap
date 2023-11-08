@@ -30,15 +30,15 @@ contract DeployScript is ScaffoldETHDeploy {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        /*   if (isLocalhost()) {
-            MockChainlinkOracle(chainlinkOracle).setFunctionsConsumer(address(escrowAutomated));
-        } */
-
         Balloons ballons = new Balloons(
             0x02C48c159FDfc1fC18BA0323D67061dE1dEA329F
         );
 
-        P2PEscrowConsumer escrowConsumer = new P2PEscrowConsumer(chainlinkOracle, DONPublicKey);
+        P2PEscrowConsumer escrowConsumer = new P2PEscrowConsumer(chainlinkOracle);
+
+        if (isLocalhost()) {
+            MockChainlinkOracle(chainlinkOracle).setFunctionsConsumer(address(escrowConsumer));
+        }
 
         console.logString(string.concat("P2PEscrow deployed at: ", vm.toString(address(escrowConsumer))));
         vm.stopBroadcast();
