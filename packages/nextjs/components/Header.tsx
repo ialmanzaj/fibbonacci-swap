@@ -2,9 +2,11 @@ import React, { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Bars3Icon, BugAntIcon, MagnifyingGlassIcon, SparklesIcon } from "@heroicons/react/24/outline";
-import { FaucetButton, RainbowKitCustomConnectButton, BelvoConnectButton } from "~~/components/scaffold-eth";
+import { hardhat } from "wagmi/chains";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import { BelvoConnectButton, FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
+import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
   const router = useRouter();
@@ -26,6 +28,7 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
 /**
  * Site header
  */
+
 export const Header = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const burgerMenuRef = useRef<HTMLDivElement>(null);
@@ -34,22 +37,21 @@ export const Header = () => {
     useCallback(() => setIsDrawerOpen(false), []),
   );
 
+  const ConditionalLinks = () => (
+    <>
+      <li>
+        <NavLink href="/debug">Debug Contracts</NavLink>
+      </li>
+      <li>
+        <NavLink href="/blockexplorer">Block Explorer</NavLink>
+      </li>
+    </>
+  );
+
   const navLinks = (
     <>
       <li>
         <NavLink href="/">Home</NavLink>
-      </li>
-      <li>
-        <NavLink href="/debug">
-         {/*  <BugAntIcon className="h-4 w-4" /> */}
-          Debug Contracts
-        </NavLink>
-      </li>
-      <li>
-        <NavLink href="/blockexplorer">
-         {/*  <MagnifyingGlassIcon className="h-4 w-4" /> */}
-          Block Explorer
-        </NavLink>
       </li>
     </>
   );
@@ -57,7 +59,7 @@ export const Header = () => {
   return (
     <div className="sticky lg:static top-0 navbar bg-gray-800 min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2">
       <div className="navbar-start w-auto lg:w-1/2">
-        <div className="lg:hidden dropdown" ref={burgerMenuRef}>
+        <div className="hidden" ref={burgerMenuRef}>
           <label
             tabIndex={0}
             className={`ml-1 btn btn-ghost ${isDrawerOpen ? "hover:bg-secondary" : "hover:bg-transparent"}`}
@@ -79,7 +81,7 @@ export const Header = () => {
             </ul>
           )}
         </div>
-        <Link href="/" passHref className="hidden lg:flex items-center gap-1 ml-2 mr-4">
+        <Link href="/" passHref className="hidden md:flex items-center gap-1 ml-2 mr-4">
           <div className="flex relative w-10 h-10">
             <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
           </div>
@@ -88,7 +90,10 @@ export const Header = () => {
             <span className="text-xs">On/off ramp Fiat to Crypto for LATAM</span>
           </div>
         </Link>
-        <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">{navLinks}</ul>
+        <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
+          {navLinks}
+          {getTargetNetwork().id === hardhat.id && <ConditionalLinks />}
+        </ul>
       </div>
       <div className="navbar-end flex-grow mr-4">
         <BelvoConnectButton />
