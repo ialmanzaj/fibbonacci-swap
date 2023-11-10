@@ -5,7 +5,7 @@ const contracts = {
       chainId: "31337",
       contracts: {
         Balloons: {
-          address: "0x998abeb3E57409262aE5b751f60747921B33613E",
+          address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
           abi: [
             {
               inputs: [
@@ -291,7 +291,7 @@ const contracts = {
           ],
         },
         P2PEscrowConsumer: {
-          address: "0x70e0bA845a1A0F2DA3359C97E0285013525FFC49",
+          address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
           abi: [
             {
               inputs: [

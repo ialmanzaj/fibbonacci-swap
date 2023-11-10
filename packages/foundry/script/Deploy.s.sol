@@ -31,7 +31,7 @@ contract DeployScript is ScaffoldETHDeploy {
         vm.startBroadcast(deployerPrivateKey);
 
         Balloons ballons = new Balloons(
-            0x02C48c159FDfc1fC18BA0323D67061dE1dEA329F
+            0x5E15DBf75d3819Dd9DA31Fc159Ce5bc5f3751AB0
         );
 
         P2PEscrowConsumer escrowConsumer = new P2PEscrowConsumer(chainlinkOracle);
