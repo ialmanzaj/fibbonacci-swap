@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { hardhat } from "wagmi/chains";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import { BelvoConnectButton, FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import BelvoWidget from "~~/components/scaffold-eth/BelvoWidget";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
@@ -57,7 +58,7 @@ export const Header = () => {
   );
 
   return (
-    <div className="sticky lg:static top-0 navbar bg-gray-800 min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2">
+    <div className="sticky lg:static top-0 navbar bg-black min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2">
       <div className="navbar-start w-auto lg:w-1/2">
         <div className="hidden" ref={burgerMenuRef}>
           <label
@@ -96,7 +97,7 @@ export const Header = () => {
         </ul>
       </div>
       <div className="navbar-end flex-grow mr-4">
-        <BelvoConnectButton />
+        <BelvoWidget />
         <RainbowKitCustomConnectButton />
         <FaucetButton />
       </div>

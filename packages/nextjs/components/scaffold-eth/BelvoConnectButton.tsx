@@ -14,33 +14,32 @@ import {
 import { Address, Balance, BlockieAvatar } from "~~/components/scaffold-eth";
 import { useNetworkColor } from "~~/hooks/scaffold-eth";
 import { getBlockExplorerAddressLink, getTargetNetwork } from "~~/utils/scaffold-eth";
-import  { createWidget } from "~~/components/BelvoWidget";
 
 /**
  * Custom Wagmi Connect Button (watch balance + custom design)
  */
-export const BelvoConnectButton = () => {
+export const BelvoConnectButton = ({ text = "", launchWidget }) => {
   const { disconnect } = useDisconnect();
   const [addressCopied, setAddressCopied] = useState(false);
   const [connected, setConnected] = useState(false);
-
+  console.log(text);
   if (!connected) {
     return (
-      <button className="btn btn-secondary btn-xs"   onClick={() => createWidget(true)} type="button">
+      <button className="btn btn-secondary btn-xs" type="button" onClick={launchWidget}>
         <img
-            width={20}
-            height={20}
-            className="mr-2 rounded-full"
-            src="https://wise.com/web-art/assets/flags/cop.svg"
-            alt="USD Coin"
-            style={{ borderWidth: "1.2px" }}
-          /> Conecta cuenta de banco
+          width={20}
+          height={20}
+          className="mr-2 rounded-full"
+          src="https://wise.com/web-art/assets/flags/cop.svg"
+          alt="USD Coin"
+          style={{ borderWidth: "1.2px" }}
+        />
+        {text}
       </button>
     );
   }
 
   return (
-   
     <div className="px-2 flex justify-end items-center">
       <div className="flex flex-col items-center mr-1">
         {/* <Balance address={account.address} className="min-h-0 h-auto" />
