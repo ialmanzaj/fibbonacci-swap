@@ -51,3 +51,7 @@ p {
   --tw-bg-opacity: 1;
   background-color: rgb(15 16 20 / var(--tw-bg-opacity));
 }
+
+.rounded-3xl {
+  border-radius: 1.5rem;
+}

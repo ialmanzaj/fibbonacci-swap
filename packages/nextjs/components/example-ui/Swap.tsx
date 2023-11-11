@@ -1,7 +1,7 @@
 const Swap = ({ value, exchangeValue, data, handleChange, isSelling, setValue, setVisible }) => {
   return (
     <main className="relative my-auto flex flex-col items-center">
-      <section className="w-full max-w-md">
+      <section className="w-full max-w-sm">
         <div className="relative mb-10">
           <div className="mb-4 flex items-center justify-between md:justify-end">
             <nav className="flex-1 z-[1] flex items-center">
@@ -70,7 +70,7 @@ const Swap = ({ value, exchangeValue, data, handleChange, isSelling, setValue, s
             </div>
           </div>
           <div className="dark:bg-form-gradient rounded-[20px] bg-light-form-gradient">
-            <div className="relative flex justify-between w-full h-24 p-1.5 rounded-xl transition-all items-start rounded-[20px] border h-[141px] px-4 py-6 md:p-6 items-center dark:bg-formActive/[0.08] dark:border-[#272D67] border-[#272D67] bg-[#18181B]">
+            <div className="relative flex justify-between w-full h-24 p-1.5 rounded-xl transition-all items-start rounded-[20px] border h-[131px] px-4 py-6 md:p-6 items-center dark:bg-formActive/[0.08] dark:border-[#272D67] border-[#272D67] bg-[#18181B]">
               <div className="flex justify-between overflow-hidden w-full">
                 <div className="flex flex-col w-full justify-between">
                   <div className="">
@@ -152,7 +152,7 @@ const Swap = ({ value, exchangeValue, data, handleChange, isSelling, setValue, s
                 </div>
               </button>
             </div>
-            <div className="flex w-full flex-wrap items-start justify-between rounded-xl p-1.5 rounded-[20px] border border-transparent h-[141px] px-4 py-8 md:p-8 items-center dark:border-[#272D67] border-[#272D67] bg-ebony">
+            <div className="flex w-full flex-wrap items-start justify-between rounded-xl p-1.5 rounded-[20px] border border-transparent h-[131px] px-4 py-8 md:p-8 items-center dark:border-[#272D67] border-[#272D67] bg-ebony">
               <div className="flex justify-between overflow-hidden w-full">
                 <div className="flex flex-col w-full justify-between">
                   <div className="">

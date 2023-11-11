@@ -80,7 +80,7 @@ const BuySteps: React.FC<BuyStepsProps> = ({ children }) => {
     <div className="flex w-screen flex-wrap ">
       <div className="flex w-full flex-col md:w-1/2 mx-auto">
         <div className="flex flex-col justify-center pt-8 md:justify-start">
-          <div className="flex w-full flex-col rounded-2xl bg-ebony shadow-inset px-6 pt-12">
+          <div className="flex w-full flex-col rounded-3xl bg-ebony shadow-inset pt-12">
             <div className="mx-auto w-full max-w-md pb-8 px-8 sm:px-0">
               <div className="relative">
                 <div className="absolute left-0 top-2 h-0.5 w-full bg-gray-200" aria-hidden="true">
