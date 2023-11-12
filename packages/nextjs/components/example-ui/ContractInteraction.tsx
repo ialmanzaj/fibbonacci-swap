@@ -6,18 +6,21 @@ import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaf
 
 export const ContractInteraction = () => {
   const CURRENTPRICES = [4200, 4150, 4180];
-  const [visible, setVisible] = useState(true);
   const [value, setValue] = useState<number | null>(null);
   const [exchangeValue, setExchangeValue] = useState<number | null>(null);
-  const [isSelling, setIsSelling] = useState(false);
   const { address } = useAccount();
+  const [isSelling, setIsSelling] = useState(false);
 
   useEffect(() => {
     const currentPrice = Math.min(...CURRENTPRICES);
     if (value != null) {
-      setExchangeValue(value * currentPrice);
+      if (!isSelling) {
+        setExchangeValue(value / currentPrice);
+      } else {
+        setExchangeValue(value * currentPrice);
+      }
     }
-  }, [value]);
+  }, [value, isSelling]);
 
   const { data } = useScaffoldContractRead({
     contractName: "Balloons",
@@ -33,23 +36,23 @@ export const ContractInteraction = () => {
       const inputValue = e.target.value.replace(/[^\d]/g, ""); // Remove non-numeric characters
       // Format the number using Intl.NumberFormat
       //const formattedValue = new Intl.NumberFormat().format(Number(inputValue));
-      setValue(inputValue);
+      setValue(inputValue as unknown as number);
     }
   };
 
   return (
     <div className="flex relative pb-10 bg-black">
-      <BuyStepOne>
-        <Swap
-          value={value}
-          handleChange={handleChange}
-          exchangeValue={exchangeValue}
-          data={data}
-          setValue={setValue}
-          isSelling={isSelling}
-          setVisible={setVisible}
-        />
-      </BuyStepOne>
+      {/* <BuyStepOne> */}
+      <Swap
+        setIsSelling={setIsSelling}
+        isSelling={isSelling}
+        value={value}
+        handleChange={handleChange}
+        exchangeValue={exchangeValue}
+        data={data}
+        setValue={setValue}
+      />
+      {/* </BuyStepOne> */}
     </div>
   );
 };

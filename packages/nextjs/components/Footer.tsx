@@ -31,31 +31,11 @@ export const Footer = () => {
       <div className="w-full">
         <ul className="menu menu-horizontal w-full">
           <div className="flex justify-center items-center gap-2 text-sm w-full">
-            {/* <div>
-              <a
-                href="https://github.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="underline underline-offset-2"
-              >
-                Fork me
-              </a>
-            </div> */}
             <span>·</span>
             <div>
               Built with <HeartIcon className="inline-block h-4 w-4" /> in Medellin
             </div>
             <span>·</span>
-            {/* <div>
-              <a
-                href="https://t.me/"
-                target="_blank"
-                rel="noreferrer"
-                className="underline underline-offset-2"
-              >
-                Support
-              </a>
-            </div> */}
           </div>
         </ul>
       </div>
