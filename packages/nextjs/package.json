@@ -11,11 +11,15 @@
     "format": "prettier --write . '!(node_modules|.next|contracts)/**/*'",
     "check-types": "tsc --noEmit --incremental",
     "vercel": "vercel",
-    "vercel:yolo": "vercel --build-env NEXT_PUBLIC_IGNORE_BUILD_ERROR=true"
+    "vercel:yolo": "vercel --build-env NEXT_PUBLIC_IGNORE_BUILD_ERROR=true",
+    "generate": "prisma generate",
+    "generate-run": "prisma generate && next dev"
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
     "@heroicons/react": "^2.0.11",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "5.0.0",
     "@rainbow-me/rainbowkit": "^1.0.4",
     "@rainbow-me/rainbowkit-siwe-next-auth": "^0.3.2",
     "@uniswap/sdk-core": "^4.0.1",
@@ -55,6 +59,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "postcss": "^8.4.16",
     "prettier": "^2.8.4",
+    "prisma": "5.0.0",
     "tailwindcss": "^3.1.8",
     "typescript": "^4.9.5",
     "vercel": "^28.15.1"

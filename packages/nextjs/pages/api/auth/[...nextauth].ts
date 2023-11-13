@@ -8,6 +8,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
+import { db } from "~~/services/db";
 
 export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
   const providers = [
@@ -32,8 +33,38 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
           }
 
           await siwe.verify({ signature: credentials?.signature || "" });
+          const address = siwe.address;
+
+          // Check if user exists
+          let user = await db.user.findUnique({
+            where: {
+              address: address,
+            },
+          });
+
+          // Create new user if doesn't exist
+          if (!user) {
+            user = await db.user.create({
+              data: {
+                address: address,
+              },
+            });
+            // create account
+            await db.account.create({
+              data: {
+                userId: user.id,
+                type: "credentials",
+                provider: "Ethereum",
+                providerAccountId: address,
+              },
+            });
+          }
+
           return {
-            id: siwe.address,
+            // Pass user id instead of address
+            // id: fields.address
+            id: user.id,
+            address: address,
           };
         } catch (e) {
           return null;
