@@ -21,8 +21,11 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
     bytes private encryptedSecretsUrls;
 
     /// @notice The optional secrets DON in the fintech API request
-    uint8 private donHostedSecretsSlotID;
-    uint64 private donHostedSecretsVersion;
+    //uint8 private donHostedSecretsSlotID;
+
+    // The secrets with IDs to fetch fintech API
+    mapping(address => uint8) private secretsDonHostedSecretsSlotID;
+    mapping(address => uint64) private secretsDonHostedSecretsVersion;
 
     /// @notice The subscription ID for Chainlink Functions
     uint64 private subscriptionId;
@@ -59,21 +62,15 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
     // INTERNAL
 
     /// @notice Requests a fintech API result
-    function _requestResult(
-        uint256 orderId,
-        //uint256 amount,
-        //uint256 startedAt,
-        string memory linkId,
-        string memory accountId,
-        string memory makerId
-    ) internal returns (bytes32 requestId) {
+    function _requestResult(uint256 orderId, uint256 amount, uint256 startedAt, address taker)
+        internal
+        returns (bytes32 requestId)
+    {
         // Prepare the arguments for the Chainlink Functions request
-        string[] memory args = new string[](5);
-        args[0] = linkId;
-        args[1] = accountId;
-        args[2] = makerId;
-        //args[3] = Strings.toString(amount);
-        //args[4] = Strings.toString(startedAt);
+        string[] memory args = new string[](3);
+        args[0] = Strings.toString(amount);
+        args[1] = Strings.toString(startedAt);
+        args[2] = Strings.toHexString(uint256(uint160(taker)), 20);
 
         // Send the Chainlink Functions request
         requestId = _executeRequest(args);
@@ -89,10 +86,13 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
     function _executeRequest(string[] memory args) internal returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source);
-        if (encryptedSecretsUrls.length > 0) {
-            req.addSecretsReference(encryptedSecretsUrls);
-        } else if (donHostedSecretsVersion > 0) {
-            req.addDONHostedSecrets(donHostedSecretsSlotID, donHostedSecretsVersion);
+        //if (encryptedSecretsUrls.length > 0) {
+        //req.addSecretsReference(encryptedSecretsUrls);
+        //} else
+        if (secretsDonHostedSecretsSlotID[msg.sender] > 0) {
+            req.addDONHostedSecrets(
+                secretsDonHostedSecretsSlotID[msg.sender], secretsDonHostedSecretsVersion[msg.sender]
+            );
         }
         if (args.length > 0) req.setArgs(args);
         requestId = _sendRequest(req.encodeCBOR(), subscriptionId, gasLimit, donId);
@@ -120,9 +120,9 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
     }
 
     /// @notice Update the request secrets in DON settings
-    function updateSecretsDon(uint8 _donHostedSecretsSlotID, uint64 _donHostedSecretsVersion) external onlyOwner {
-        donHostedSecretsSlotID = _donHostedSecretsSlotID;
-        donHostedSecretsVersion = _donHostedSecretsVersion;
+    function updateSecretsDon(uint8 _donHostedSecretsSlotID, uint64 _donHostedSecretsVersion) external {
+        secretsDonHostedSecretsSlotID[msg.sender] = _donHostedSecretsSlotID;
+        secretsDonHostedSecretsVersion[msg.sender] = _donHostedSecretsVersion;
     }
 
     /// @notice Processes the result of a fintech API request
