@@ -1,13 +1,6 @@
-// pages/api/access-token.ts
-import belvo from "belvo";
 import { NextApiRequest, NextApiResponse } from "next";
+import { belvoClient } from "~~/services/belvo";
 
-// Server setup
-const client = new belvo(
-  "316065a1-5666-4b1e-820e-0c0561dfbacd",
-  "xrZ#KcqY96EicRBw3h6@6VQC9qT08*rJDn2Qxc1yIyRSmvY1CP*#N_FIk#ar7Vlh",
-  "https://sandbox.belvo.com",
-);
 
 // Widget branding
 const widget = {
@@ -26,9 +19,9 @@ const options = { widget };
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
-      await client.connect();
+      await belvoClient.connect();
       console.log(options);
-      const response = await client.widgetToken.create(options);
+      const response = await belvoClient.widgetToken.create(options);
       res.json(response);
     } catch (error) {
       console.error(error);
