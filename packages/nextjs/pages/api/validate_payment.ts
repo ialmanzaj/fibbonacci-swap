@@ -11,14 +11,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const finalAtDate = finalAt.toISOString().slice(0, 10);
 
     current.setDate(current.getDate() - 1);
-    console.log(startedAtDate, belvoClient)
 
     await belvoClient.connect();
     const transactions = await belvoClient.transactions.retrieve(link, startedAtDate, finalAtDate, {
       saveData: false,
       account: account,
     });
-    console.log(transactions)
     transactions.filter((transaction: any) => transaction.type === "OUTFLOW");
     res.json(transactions);
   }
