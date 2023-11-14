@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { belvoClient } from "~~/services/belvo";
 
-
 // Widget branding
 const widget = {
   branding: {
@@ -20,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     try {
       await belvoClient.connect();
-      console.log(options);
       const response = await belvoClient.widgetToken.create(options);
       res.json(response);
     } catch (error) {

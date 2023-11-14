@@ -9,10 +9,12 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import { db } from "~~/services/db";
+import { compareKeys, generateKey, generateSecretHash } from "~~/services/encrypt";
 
 export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
   const providers = [
     CredentialsProvider({
+      name: "Ethereum",
       async authorize(credentials) {
         try {
           const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
@@ -42,11 +44,15 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
             },
           });
 
+          const key = generateKey();
+          const secret = generateSecretHash(key);
+
           // Create new user if doesn't exist
           if (!user) {
             user = await db.user.create({
               data: {
                 address: address,
+                secretKey: secret,
               },
             });
             // create account
@@ -82,7 +88,46 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
           type: "text",
         },
       },
-      name: "Ethereum",
+    }),
+    CredentialsProvider({
+      id: "smart-contract",
+      name: "Smart contract Credentials",
+      // The name to display on the sign in form (e.g. "Sign in with...")
+      // `credentials` is used to generate a form on the sign in page.
+      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
+      // e.g. domain, username, password, 2FA token, etc.
+      // You can pass any HTML attribute to the <input> tag through the object.
+      credentials: {
+        apiKey: { label: "API key", type: "text" },
+        secretKey: { label: "Secret", type: "password" },
+      },
+      async authorize(credentials, req) {
+        console.log("api-key");
+        if (!credentials?.apiKey || !credentials?.secretKey) {
+          throw new Error("Please enter an apiKey and secret");
+        }
+
+        // check to see if user exists
+        const user = await db.user.findUnique({
+          where: {
+            secretKey: credentials?.secretKey,
+          },
+        });
+
+        // if no user was found
+        if (!user || !user?.secretKey) {
+          throw new Error("No user found");
+        }
+
+        // check to see if password matches
+        const passwordMatch = compareKeys(user.secretKey, credentials.apiKey);
+
+        // if password does not match
+        if (!passwordMatch) {
+          throw new Error("Incorrect credentials");
+        }
+        return user;
+      },
     }),
   ];
 

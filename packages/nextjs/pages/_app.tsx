@@ -19,7 +19,7 @@ import { appChains } from "~~/services/web3/wagmiConnectors";
 import "~~/styles/globals.css";
 
 const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: "Sign in to my RainbowKit app",
+  statement: "Sign in to Fibbonacci Swap",
 });
 
 const ScaffoldEthApp = ({
