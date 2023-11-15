@@ -17,3 +17,15 @@ export function generateSecretHash(key: string) {
   const buffer = scryptSync(key, salt, 64) as Buffer;
   return `${buffer.toString("hex")}.${salt}`;
 }
+
+export function hasMatchingKey(keys, key: string) {
+  for (let i = 0; i < keys.length; i++) {
+    if (compareKeys(keys[i].hash, key)) {
+      // Found a match
+      return keys[i];
+    }
+  }
+
+  // No match found
+  return null;
+}

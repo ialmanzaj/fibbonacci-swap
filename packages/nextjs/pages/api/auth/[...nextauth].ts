@@ -52,7 +52,6 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
             user = await db.user.create({
               data: {
                 address: address,
-                secretKey: secret,
               },
             });
             // create account
@@ -64,12 +63,18 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
                 providerAccountId: address,
               },
             });
+            await db.key.create({
+              data: {
+                userId: user.id,
+                hash: secret,
+              },
+            });
           }
 
           return {
             // Pass user id instead of address
             // id: fields.address
-            id: user.id,
+            id: user?.id,
             address: address,
           };
         } catch (e) {
@@ -87,46 +92,6 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
           placeholder: "0x0",
           type: "text",
         },
-      },
-    }),
-    CredentialsProvider({
-      id: "smart-contract",
-      name: "Smart contract Credentials",
-      // The name to display on the sign in form (e.g. "Sign in with...")
-      // `credentials` is used to generate a form on the sign in page.
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
-      // You can pass any HTML attribute to the <input> tag through the object.
-      credentials: {
-        apiKey: { label: "API key", type: "text" },
-        secretKey: { label: "Secret", type: "password" },
-      },
-      async authorize(credentials, req) {
-        console.log("api-key");
-        if (!credentials?.apiKey || !credentials?.secretKey) {
-          throw new Error("Please enter an apiKey and secret");
-        }
-
-        // check to see if user exists
-        const user = await db.user.findUnique({
-          where: {
-            secretKey: credentials?.secretKey,
-          },
-        });
-
-        // if no user was found
-        if (!user || !user?.secretKey) {
-          throw new Error("No user found");
-        }
-
-        // check to see if password matches
-        const passwordMatch = compareKeys(user.secretKey, credentials.apiKey);
-
-        // if password does not match
-        if (!passwordMatch) {
-          throw new Error("Incorrect credentials");
-        }
-        return user;
       },
     }),
   ];
@@ -154,7 +119,6 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
 // https://next-auth.js.org/configuration/options
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
   const authOptions = getAuthOptions(req);
-
   if (!Array.isArray(req.query.nextauth)) {
     res.status(400).send("Bad request");
     return;
