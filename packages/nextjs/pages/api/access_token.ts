@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.json(response);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Belvo Server Error" });
     }
   } else {
     res.status(405).json({ error: "Method Not Allowed" });
