@@ -9,7 +9,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import { db } from "~~/services/db";
-import { compareKeys, generateKey, generateSecretHash } from "~~/services/encrypt";
 
 export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
   const providers = [
@@ -44,9 +43,6 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
             },
           });
 
-          const key = generateKey();
-          const secret = generateSecretHash(key);
-
           // Create new user if doesn't exist
           if (!user) {
             user = await db.user.create({
@@ -61,12 +57,6 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
                 type: "credentials",
                 provider: "Ethereum",
                 providerAccountId: address,
-              },
-            });
-            await db.key.create({
-              data: {
-                userId: user.id,
-                hash: secret,
               },
             });
           }

@@ -1,5 +1,4 @@
-import { db } from "./db";
-import { hasMatchingKey } from "./encrypt";
+import { verifyKey } from "@unkey/api";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export function withApiKey(
@@ -15,13 +14,20 @@ export function withApiKey(
       return apiKey;
     }
 
-    const keys = await db.key.findMany();
-    const hasMatch = hasMatchingKey(keys, apiKey);
-    if (!hasMatch) {
+    const { result, error } = await verifyKey(apiKey);
+
+    if (error) {
+      // handle potential network or bad request error
+      // a link to our docs will be in the `error.docs` field
+      console.error(error.message);
+      return res.status(401).json({ error: error.message });
+    }
+
+    if (!result.valid) {
+      // do not grant access
       return res.status(403).json({ error: "Invalid key" });
     }
 
-    req.body["userId"] = hasMatch.userId;
     return handler(req, res);
   };
 }

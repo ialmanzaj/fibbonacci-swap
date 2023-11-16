@@ -8,7 +8,7 @@ const POST = withApiKey(async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { userId, amount, startedAt, taker, link, account } = req.body;
+  const { taker, maker, amount, startedAt, link, account } = req.body;
 
   const newestDate = new Date(startedAt * 1000);
   const newestDateStr = newestDate.toISOString().slice(0, 10);
@@ -17,9 +17,17 @@ const POST = withApiKey(async (req: NextApiRequest, res: NextApiResponse) => {
   oldestDate.setDate(newestDate.getDate() - 1);
   const oldestDateStr = oldestDate.toISOString().slice(0, 10);
 
-  const user = await db.user.findUnique({
+  //todo: get user to get the link and account for belvo api
+  const makerUser = await db.user.findUnique({
     where: {
-      id: userId,
+      address: maker,
+    },
+  });
+
+  //todo: get bank account details to validate against
+  const takerUser = await db.user.findUnique({
+    where: {
+      address: taker,
     },
   });
 
@@ -32,7 +40,7 @@ const POST = withApiKey(async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     transactions.filter((transaction: any) => transaction.type === "OUTFLOW");
-    res.json(transactions);
+    res.json(true);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Belvo Server Error" });
