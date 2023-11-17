@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity 0.8.19;
 
 import {P2PEscrowConsumer} from "../contracts/P2PEscrowConsumer.sol";
 import {Balloons} from "../contracts/Balloons.sol";
@@ -8,9 +8,11 @@ import "./DeployHelpers.s.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
     address public chainlinkOracle; // NOTE : set this address if you want to deploy to live network
-    bytes32 DONPublicKey = bytes32("DON_PUBLIC_KEY");
-
-    error InvalidPrivateKey(string);
+    bytes32 DON = bytes32("DON_PUBLIC_KEY");
+    uint32 public gasLimit = 300000;
+    uint64 public subscriptionId = 0;
+    string private constant source = "";
+    bytes private constant secrets = "";
 
     function run() external {
         uint256 deployerPrivateKey = setupLocalhostEnv();
@@ -22,18 +24,17 @@ contract DeployScript is ScaffoldETHDeploy {
 
         if (isLocalhost()) {
             MockChainlinkOracle mockChainlinkOracle = new MockChainlinkOracle(
-                DONPublicKey
+                DON
             );
             chainlinkOracle = address(mockChainlinkOracle);
         }
 
         vm.startBroadcast(deployerPrivateKey);
 
-        Balloons ballons = new Balloons(
-            0x5E15DBf75d3819Dd9DA31Fc159Ce5bc5f3751AB0
-        );
+        Balloons ballons = new Balloons(0x02C48c159FDfc1fC18BA0323D67061dE1dEA329F);
 
-        P2PEscrowConsumer escrowConsumer = new P2PEscrowConsumer(chainlinkOracle);
+        P2PEscrowConsumer escrowConsumer =
+            new P2PEscrowConsumer(chainlinkOracle, source, secrets, subscriptionId, gasLimit, DON);
 
         if (isLocalhost()) {
             MockChainlinkOracle(chainlinkOracle).setFunctionsConsumer(address(escrowConsumer));
