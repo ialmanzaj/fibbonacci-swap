@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { hardhat } from "wagmi/chains";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import BelvoWidget from "~~/components/scaffold-eth/BelvoWidget";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
@@ -54,6 +53,9 @@ export const Header = () => {
       <li>
         <NavLink href="/">Home</NavLink>
       </li>
+      <li>
+        <NavLink href="/liquidity">Merchant</NavLink>
+      </li>
     </>
   );
 
@@ -97,7 +99,6 @@ export const Header = () => {
         </ul>
       </div>
       <div className="navbar-end flex-grow mr-4">
-        <BelvoWidget />
         <RainbowKitCustomConnectButton />
         <FaucetButton />
       </div>
