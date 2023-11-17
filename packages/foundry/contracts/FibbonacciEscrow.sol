@@ -10,14 +10,11 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
  * @title
  * @notice
  */
-contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
+contract FibbonacciEscrow is ResultsConsumer, AutomationCompatibleInterface {
     using SafeERC20 for IERC20;
 
     /// @notice Mapping of escrow IDs to escrows data
     mapping(uint256 => Escrow) public escrows;
-
-    /// @notice Mapping of offers IDs to offers data
-    mapping(uint256 => Offer) public offers;
 
     /// @notice Mapping of escrow IDs to Chainlink Functions request IDs
     mapping(uint256 => bytes32) private pendingRequests;
@@ -25,28 +22,19 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
 
     // STRUCTS
 
-    struct Offer {
-        uint256 createdAt; // The timestamp of created
-        uint256 offerId; // The ID of the offer
-        uint256 amount; // amount in custody
-        uint256 min;
-        uint256 max;
-        IERC20 token; // currency in custody
-        address maker; // the seller address
-    }
-
     struct Escrow {
-        uint256 startedAt; // The timestamp of the escrow start time
+        uint256 createdAt; // The timestamp of created
+        uint256 finishedAt; // The timestamp of the escrow finished time
         uint256 deadline; // The total deadline of the deal
         uint256 dealAmount; //  deal amount
         address taker; // the buyer address
-        Offer offer; // maker offer
+        uint256 exchangeAmountWei; // the fiat amount
+        address maker; // the seller address
         EscrowStatus status;
+        IERC20 token; // currency in custody
     }
 
     // EVENTS
-    event LiquidityAdded(uint256 indexed offerId, Offer offer);
-    event OfferAdded(uint256 indexed offerId, Offer offer);
     event EscrowAccepted(uint256 indexed orderId, Escrow escrow);
     event EscrowReleased(uint256 indexed orderId, Escrow escrow);
 
@@ -60,6 +48,7 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
 
     // ERRORS
     error Escrow__DepositAmountMustBeGreaterThanZero();
+    error Escrow__ExchangeAmountMustBeGreaterThanZero();
     error Escrow__IsZeroAddress();
     error Escrow__WithdrawalHasAlreadyBeenExecuted();
     error Escrow__IsAlreadyActive();
@@ -79,57 +68,21 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
 
     // ACTIONS
 
-    // add fiat liquidity
-    function addLiquidity(uint256 _offerId, uint256 _priceWei, uint256 _minAmount, uint256 _maxAmount, IERC20 _token)
-        public
-    {
-        if (_priceWei == 0) {
-            revert Escrow__DepositAmountMustBeGreaterThanZero();
+    function takeDeal(
+        uint256 _orderId,
+        uint256 _amount,
+        uint256 _exchangeAmountWei,
+        uint256 _deadline,
+        address maker,
+        IERC20 _token
+    ) external {
+        if (_exchangeAmountWei == 0) {
+            revert Escrow__ExchangeAmountMustBeGreaterThanZero();
         }
-
-        offers[_offerId] = Offer(
-            block.timestamp, // createdAt
-            _offerId, // the current Id
-            _priceWei, // amount in fiat
-            _minAmount,
-            _maxAmount,
-            _token, // token in exchange
-            msg.sender // seller
-        );
-
-        emit LiquidityAdded(_offerId, offers[_offerId]);
-    }
-
-    /*  function addOffer(uint256 _offerId, uint256 _amount, uint256 _deadline, IERC20 _token) public {
         if (_amount == 0) {
             revert Escrow__DepositAmountMustBeGreaterThanZero();
         }
-
-        if (escrows[_offerId].status == EscrowStatus.ACTIVE) {
-            revert Escrow__IsAlreadyActive();
-        }
-
-        //transfer stablecoin to contract
-        _token.safeTransferFrom(msg.sender, address(this), _amount);
-
-        offers[_offerId] = Offer(
-            block.timestamp, // createdAt
-            _offerId, // the current Id
-            _amount, // amount in custody
-            0,
-            0,
-            _token, // token in custody
-            msg.sender // seller
-        );
-
-        emit OfferAdded(_offerId, offers[_offerId]);
-    } */
-
-    function takeDeal(uint256 _orderId, uint256 _offerId, uint256 _amount, uint256 _deadline, IERC20 _token) external {
-        if (_amount == 0) {
-            revert Escrow__DepositAmountMustBeGreaterThanZero();
-        }
-        if (escrows[_orderId].offer.maker == msg.sender) {
+        if (maker == msg.sender) {
             revert Escrow__BuyerCannotBeSameAsSeller();
         }
 
@@ -142,11 +95,12 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         // set taker data
         escrows[_orderId].taker = msg.sender;
         escrows[_orderId].dealAmount = _amount;
-        escrows[_orderId].offer = offers[_offerId];
+        escrows[_orderId].exchangeAmountWei = _exchangeAmountWei;
 
         // update escrow data
+        escrows[_orderId].maker = maker;
         escrows[_orderId].status = EscrowStatus.ACTIVE;
-        escrows[_orderId].startedAt = block.timestamp;
+        escrows[_orderId].createdAt = block.timestamp;
         escrows[_orderId].deadline = _deadline;
 
         emit EscrowAccepted(_orderId, escrows[_orderId]);
@@ -167,7 +121,7 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         // Request the result of the escrow via ResultsConsumer contract
         // Store the Chainlink Functions request ID to prevent duplicate requests
         pendingRequests[orderId] =
-            _requestResult(orderId, escrow.offer.maker, escrow.taker, escrow.dealAmount, escrow.startedAt);
+            _requestResult(orderId, escrow.maker, escrow.taker, escrow.dealAmount, escrow.createdAt);
     }
 
     /// @notice Process the result of a escrow from the external fintech API

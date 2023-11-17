@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity 0.8.19;
 
 import "forge-std/Test.sol";
-import {P2PEscrowConsumer} from "../contracts/P2PEscrowConsumer.sol";
+import {FibbonacciEscrow} from "../contracts/FibbonacciEscrow.sol";
 import {MockChainlinkOracle} from "../contracts/MockChainlinkOracle.sol";
 
 interface ERC20 {
@@ -12,8 +12,8 @@ interface ERC20 {
     function balanceOf(address holder) external returns (uint256);
 }
 
-contract P2PEscrowConsumerTest is Test {
-    P2PEscrowConsumer public escrow;
+contract FibbonacciEscrowTest is Test {
+    FibbonacciEscrow public escrow;
     MockChainlinkOracle public mockChainlinkOracle;
 
     bytes32 public constant DON = bytes32("DON_PUBLIC_KEY");

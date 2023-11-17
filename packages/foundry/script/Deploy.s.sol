@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {P2PEscrowConsumer} from "../contracts/P2PEscrowConsumer.sol";
+import {FibbonacciEscrow, IERC20} from "../contracts/FibbonacciEscrow.sol";
 import {Balloons} from "../contracts/Balloons.sol";
 import {MockChainlinkOracle} from "../contracts/MockChainlinkOracle.sol";
 import "./DeployHelpers.s.sol";
@@ -33,8 +33,8 @@ contract DeployScript is ScaffoldETHDeploy {
 
         Balloons ballons = new Balloons(0x02C48c159FDfc1fC18BA0323D67061dE1dEA329F);
 
-        P2PEscrowConsumer escrowConsumer =
-            new P2PEscrowConsumer(chainlinkOracle, source, secrets, subscriptionId, gasLimit, DON);
+        FibbonacciEscrow escrowConsumer =
+            new FibbonacciEscrow(chainlinkOracle, source, secrets, subscriptionId, gasLimit, DON);
 
         if (isLocalhost()) {
             MockChainlinkOracle(chainlinkOracle).setFunctionsConsumer(address(escrowConsumer));
