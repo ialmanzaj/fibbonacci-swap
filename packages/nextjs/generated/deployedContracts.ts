@@ -5,7 +5,7 @@ const contracts = {
       chainId: "31337",
       contracts: {
         Balloons: {
-          address: "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+          address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
           abi: [
             {
               inputs: [
@@ -290,8 +290,8 @@ const contracts = {
             },
           ],
         },
-        P2PEscrowConsumer: {
-          address: "0x9A676e781A523b5d0C0e43731313A708CB607508",
+        FibbonacciEscrow: {
+          address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
           abi: [
             {
               inputs: [
@@ -356,6 +356,11 @@ const contracts = {
             },
             {
               inputs: [],
+              name: "Escrow__ExchangeAmountMustBeGreaterThanZero",
+              type: "error",
+            },
+            {
+              inputs: [],
               name: "Escrow__IsAlreadyActive",
               type: "error",
             },
@@ -408,7 +413,12 @@ const contracts = {
                   components: [
                     {
                       internalType: "uint256",
-                      name: "startedAt",
+                      name: "createdAt",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "finishedAt",
                       type: "uint256",
                     },
                     {
@@ -427,55 +437,28 @@ const contracts = {
                       type: "address",
                     },
                     {
-                      components: [
-                        {
-                          internalType: "uint256",
-                          name: "createdAt",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "offerId",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "amount",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "min",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "max",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "contract IERC20",
-                          name: "token",
-                          type: "address",
-                        },
-                        {
-                          internalType: "address",
-                          name: "maker",
-                          type: "address",
-                        },
-                      ],
-                      internalType: "struct P2PEscrowConsumer.Offer",
-                      name: "offer",
-                      type: "tuple",
+                      internalType: "uint256",
+                      name: "exchangeAmountWei",
+                      type: "uint256",
                     },
                     {
-                      internalType: "enum P2PEscrowConsumer.EscrowStatus",
+                      internalType: "address",
+                      name: "maker",
+                      type: "address",
+                    },
+                    {
+                      internalType: "enum FibbonacciEscrow.EscrowStatus",
                       name: "status",
                       type: "uint8",
                     },
+                    {
+                      internalType: "contract IERC20",
+                      name: "token",
+                      type: "address",
+                    },
                   ],
                   indexed: false,
-                  internalType: "struct P2PEscrowConsumer.Escrow",
+                  internalType: "struct FibbonacciEscrow.Escrow",
                   name: "escrow",
                   type: "tuple",
                 },
@@ -496,7 +479,12 @@ const contracts = {
                   components: [
                     {
                       internalType: "uint256",
-                      name: "startedAt",
+                      name: "createdAt",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "finishedAt",
                       type: "uint256",
                     },
                     {
@@ -515,55 +503,28 @@ const contracts = {
                       type: "address",
                     },
                     {
-                      components: [
-                        {
-                          internalType: "uint256",
-                          name: "createdAt",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "offerId",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "amount",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "min",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "max",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "contract IERC20",
-                          name: "token",
-                          type: "address",
-                        },
-                        {
-                          internalType: "address",
-                          name: "maker",
-                          type: "address",
-                        },
-                      ],
-                      internalType: "struct P2PEscrowConsumer.Offer",
-                      name: "offer",
-                      type: "tuple",
+                      internalType: "uint256",
+                      name: "exchangeAmountWei",
+                      type: "uint256",
                     },
                     {
-                      internalType: "enum P2PEscrowConsumer.EscrowStatus",
+                      internalType: "address",
+                      name: "maker",
+                      type: "address",
+                    },
+                    {
+                      internalType: "enum FibbonacciEscrow.EscrowStatus",
                       name: "status",
                       type: "uint8",
                     },
+                    {
+                      internalType: "contract IERC20",
+                      name: "token",
+                      type: "address",
+                    },
                   ],
                   indexed: false,
-                  internalType: "struct P2PEscrowConsumer.Escrow",
+                  internalType: "struct FibbonacciEscrow.Escrow",
                   name: "escrow",
                   type: "tuple",
                 },
@@ -573,120 +534,8 @@ const contracts = {
             },
             {
               anonymous: false,
-              inputs: [
-                {
-                  indexed: true,
-                  internalType: "uint256",
-                  name: "offerId",
-                  type: "uint256",
-                },
-                {
-                  components: [
-                    {
-                      internalType: "uint256",
-                      name: "createdAt",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "offerId",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "amount",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "min",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "max",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "contract IERC20",
-                      name: "token",
-                      type: "address",
-                    },
-                    {
-                      internalType: "address",
-                      name: "maker",
-                      type: "address",
-                    },
-                  ],
-                  indexed: false,
-                  internalType: "struct P2PEscrowConsumer.Offer",
-                  name: "offer",
-                  type: "tuple",
-                },
-              ],
-              name: "LiquidityAdded",
-              type: "event",
-            },
-            {
-              anonymous: false,
               inputs: [],
               name: "NoPendingRequest",
-              type: "event",
-            },
-            {
-              anonymous: false,
-              inputs: [
-                {
-                  indexed: true,
-                  internalType: "uint256",
-                  name: "offerId",
-                  type: "uint256",
-                },
-                {
-                  components: [
-                    {
-                      internalType: "uint256",
-                      name: "createdAt",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "offerId",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "amount",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "min",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "max",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "contract IERC20",
-                      name: "token",
-                      type: "address",
-                    },
-                    {
-                      internalType: "address",
-                      name: "maker",
-                      type: "address",
-                    },
-                  ],
-                  indexed: false,
-                  internalType: "struct P2PEscrowConsumer.Offer",
-                  name: "offer",
-                  type: "tuple",
-                },
-              ],
-              name: "OfferAdded",
               type: "event",
             },
             {
@@ -814,39 +663,6 @@ const contracts = {
             {
               inputs: [
                 {
-                  internalType: "uint256",
-                  name: "_offerId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "_priceWei",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "_minAmount",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "_maxAmount",
-                  type: "uint256",
-                },
-                {
-                  internalType: "contract IERC20",
-                  name: "_token",
-                  type: "address",
-                },
-              ],
-              name: "addLiquidity",
-              outputs: [],
-              stateMutability: "nonpayable",
-              type: "function",
-            },
-            {
-              inputs: [
-                {
                   internalType: "bytes",
                   name: "",
                   type: "bytes",
@@ -906,7 +722,12 @@ const contracts = {
               outputs: [
                 {
                   internalType: "uint256",
-                  name: "startedAt",
+                  name: "createdAt",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "finishedAt",
                   type: "uint256",
                 },
                 {
@@ -925,51 +746,24 @@ const contracts = {
                   type: "address",
                 },
                 {
-                  components: [
-                    {
-                      internalType: "uint256",
-                      name: "createdAt",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "offerId",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "amount",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "min",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "uint256",
-                      name: "max",
-                      type: "uint256",
-                    },
-                    {
-                      internalType: "contract IERC20",
-                      name: "token",
-                      type: "address",
-                    },
-                    {
-                      internalType: "address",
-                      name: "maker",
-                      type: "address",
-                    },
-                  ],
-                  internalType: "struct P2PEscrowConsumer.Offer",
-                  name: "offer",
-                  type: "tuple",
+                  internalType: "uint256",
+                  name: "exchangeAmountWei",
+                  type: "uint256",
                 },
                 {
-                  internalType: "enum P2PEscrowConsumer.EscrowStatus",
+                  internalType: "address",
+                  name: "maker",
+                  type: "address",
+                },
+                {
+                  internalType: "enum FibbonacciEscrow.EscrowStatus",
                   name: "status",
                   type: "uint8",
+                },
+                {
+                  internalType: "contract IERC20",
+                  name: "token",
+                  type: "address",
                 },
               ],
               stateMutability: "view",
@@ -989,7 +783,12 @@ const contracts = {
                   components: [
                     {
                       internalType: "uint256",
-                      name: "startedAt",
+                      name: "createdAt",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "finishedAt",
                       type: "uint256",
                     },
                     {
@@ -1008,54 +807,27 @@ const contracts = {
                       type: "address",
                     },
                     {
-                      components: [
-                        {
-                          internalType: "uint256",
-                          name: "createdAt",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "offerId",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "amount",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "min",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "uint256",
-                          name: "max",
-                          type: "uint256",
-                        },
-                        {
-                          internalType: "contract IERC20",
-                          name: "token",
-                          type: "address",
-                        },
-                        {
-                          internalType: "address",
-                          name: "maker",
-                          type: "address",
-                        },
-                      ],
-                      internalType: "struct P2PEscrowConsumer.Offer",
-                      name: "offer",
-                      type: "tuple",
+                      internalType: "uint256",
+                      name: "exchangeAmountWei",
+                      type: "uint256",
                     },
                     {
-                      internalType: "enum P2PEscrowConsumer.EscrowStatus",
+                      internalType: "address",
+                      name: "maker",
+                      type: "address",
+                    },
+                    {
+                      internalType: "enum FibbonacciEscrow.EscrowStatus",
                       name: "status",
                       type: "uint8",
                     },
+                    {
+                      internalType: "contract IERC20",
+                      name: "token",
+                      type: "address",
+                    },
                   ],
-                  internalType: "struct P2PEscrowConsumer.Escrow",
+                  internalType: "struct FibbonacciEscrow.Escrow",
                   name: "",
                   type: "tuple",
                 },
@@ -1084,55 +856,6 @@ const contracts = {
               name: "handleOracleFulfillment",
               outputs: [],
               stateMutability: "nonpayable",
-              type: "function",
-            },
-            {
-              inputs: [
-                {
-                  internalType: "uint256",
-                  name: "",
-                  type: "uint256",
-                },
-              ],
-              name: "offers",
-              outputs: [
-                {
-                  internalType: "uint256",
-                  name: "createdAt",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "offerId",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "amount",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "min",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "max",
-                  type: "uint256",
-                },
-                {
-                  internalType: "contract IERC20",
-                  name: "token",
-                  type: "address",
-                },
-                {
-                  internalType: "address",
-                  name: "maker",
-                  type: "address",
-                },
-              ],
-              stateMutability: "view",
               type: "function",
             },
             {
@@ -1202,18 +925,23 @@ const contracts = {
                 },
                 {
                   internalType: "uint256",
-                  name: "_offerId",
+                  name: "_amount",
                   type: "uint256",
                 },
                 {
                   internalType: "uint256",
-                  name: "_amount",
+                  name: "_exchangeAmountWei",
                   type: "uint256",
                 },
                 {
                   internalType: "uint256",
                   name: "_deadline",
                   type: "uint256",
+                },
+                {
+                  internalType: "address",
+                  name: "maker",
+                  type: "address",
                 },
                 {
                   internalType: "contract IERC20",
@@ -1558,31 +1286,6 @@ const contracts = {
                   name: "_router",
                   type: "address",
                 },
-                {
-                  internalType: "string",
-                  name: "_source",
-                  type: "string",
-                },
-                {
-                  internalType: "bytes",
-                  name: "_encryptedSecretsUrls",
-                  type: "bytes",
-                },
-                {
-                  internalType: "uint64",
-                  name: "_subscriptionId",
-                  type: "uint64",
-                },
-                {
-                  internalType: "uint32",
-                  name: "_gasLimit",
-                  type: "uint32",
-                },
-                {
-                  internalType: "bytes32",
-                  name: "_donId",
-                  type: "bytes32",
-                },
               ],
               stateMutability: "nonpayable",
               type: "constructor",
@@ -1590,11 +1293,6 @@ const contracts = {
             {
               inputs: [],
               name: "EmptyArgs",
-              type: "error",
-            },
-            {
-              inputs: [],
-              name: "EmptySecrets",
               type: "error",
             },
             {
@@ -2105,6 +1803,34 @@ const contracts = {
             {
               inputs: [
                 {
+                  internalType: "uint256",
+                  name: "_offerId",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "_amount",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "_deadline",
+                  type: "uint256",
+                },
+                {
+                  internalType: "contract IERC20",
+                  name: "_token",
+                  type: "address",
+                },
+              ],
+              name: "addOffer",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
                   internalType: "bytes",
                   name: "",
                   type: "bytes",
@@ -2442,19 +2168,6 @@ const contracts = {
               inputs: [
                 {
                   internalType: "uint256",
-                  name: "orderId",
-                  type: "uint256",
-                },
-              ],
-              name: "requestArbitration",
-              outputs: [],
-              stateMutability: "nonpayable",
-              type: "function",
-            },
-            {
-              inputs: [
-                {
-                  internalType: "uint256",
                   name: "_orderId",
                   type: "uint256",
                 },
@@ -2500,12 +2213,50 @@ const contracts = {
             {
               inputs: [
                 {
+                  internalType: "string",
+                  name: "_source",
+                  type: "string",
+                },
+                {
                   internalType: "bytes",
                   name: "_encryptedSecretsUrls",
                   type: "bytes",
                 },
+                {
+                  internalType: "uint64",
+                  name: "_subscriptionId",
+                  type: "uint64",
+                },
+                {
+                  internalType: "uint32",
+                  name: "_gasLimit",
+                  type: "uint32",
+                },
+                {
+                  internalType: "bytes32",
+                  name: "_donId",
+                  type: "bytes32",
+                },
               ],
               name: "updateRequest",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
+                  internalType: "uint8",
+                  name: "_donHostedSecretsSlotID",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint64",
+                  name: "_donHostedSecretsVersion",
+                  type: "uint64",
+                },
+              ],
+              name: "updateSecretsDon",
               outputs: [],
               stateMutability: "nonpayable",
               type: "function",
