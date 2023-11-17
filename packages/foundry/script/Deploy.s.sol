@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {P2PEscrow, IERC20} from "../contracts/P2PEscrow.sol";
 import {P2PEscrowConsumer} from "../contracts/P2PEscrowConsumer.sol";
 import {Balloons} from "../contracts/Balloons.sol";
 import {MockChainlinkOracle} from "../contracts/MockChainlinkOracle.sol";
