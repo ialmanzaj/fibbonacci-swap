@@ -1,4 +1,4 @@
-pragma solidity ^0.8.19;
+pragma solidity 0.8.19;
 
 /**
  * @dev simple contract that will help us send transactions in localhost

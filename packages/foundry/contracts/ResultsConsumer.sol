@@ -1,31 +1,21 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity 0.8.19;
 
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title ResultsConsumer
 /// @notice Requests and receives fintech results using Chainlink Functions
 abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
     using FunctionsRequest for FunctionsRequest.Request;
 
-    using SafeERC20 for IERC20;
-
     /// @notice The source code for the fintech API request
     string private source;
 
     /// @notice The secrets used in the fintech API request
     bytes private encryptedSecretsUrls;
-
-    /// @notice The optional secrets DON in the fintech API request
-    //uint8 private donHostedSecretsSlotID;
-
-    // The secrets with IDs to fetch fintech API
-    mapping(address => uint8) private secretsDonHostedSecretsSlotID;
-    mapping(address => uint64) private secretsDonHostedSecretsVersion;
 
     /// @notice The subscription ID for Chainlink Functions
     uint64 private subscriptionId;
@@ -57,20 +47,34 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
 
     /// @notice Initializes the contract
 
-    constructor(address _router) FunctionsClient(_router) ConfirmedOwner(msg.sender) {}
+    constructor(
+        address _router,
+        string memory _source,
+        bytes memory _encryptedSecretsUrls,
+        uint64 _subscriptionId,
+        uint32 _gasLimit,
+        bytes32 _donId
+    ) FunctionsClient(_router) ConfirmedOwner(msg.sender) {
+        encryptedSecretsUrls = _encryptedSecretsUrls;
+        source = _source;
+        subscriptionId = _subscriptionId;
+        gasLimit = _gasLimit;
+        donId = _donId;
+    }
 
     // INTERNAL
 
     /// @notice Requests a fintech API result
-    function _requestResult(uint256 orderId, uint256 amount, uint256 startedAt, address taker)
+    function _requestResult(uint256 orderId, address maker, address taker, uint256 amount, uint256 startedAt)
         internal
         returns (bytes32 requestId)
     {
         // Prepare the arguments for the Chainlink Functions request
-        string[] memory args = new string[](3);
-        args[0] = Strings.toString(amount);
-        args[1] = Strings.toString(startedAt);
-        args[2] = Strings.toHexString(uint256(uint160(taker)), 20);
+        string[] memory args = new string[](4);
+        args[0] = Strings.toHexString(uint256(uint160(maker)), 20);
+        args[1] = Strings.toHexString(uint256(uint160(taker)), 20);
+        args[2] = Strings.toString(amount);
+        args[3] = Strings.toString(startedAt);
 
         // Send the Chainlink Functions request
         requestId = _executeRequest(args);
@@ -86,43 +90,17 @@ abstract contract ResultsConsumer is FunctionsClient, ConfirmedOwner {
     function _executeRequest(string[] memory args) internal returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source);
-        //if (encryptedSecretsUrls.length > 0) {
-        //req.addSecretsReference(encryptedSecretsUrls);
-        //} else
-        if (secretsDonHostedSecretsSlotID[msg.sender] > 0) {
-            req.addDONHostedSecrets(
-                secretsDonHostedSecretsSlotID[msg.sender], secretsDonHostedSecretsVersion[msg.sender]
-            );
+        if (encryptedSecretsUrls.length > 0) {
+            req.addSecretsReference(encryptedSecretsUrls);
         }
-        if (args.length > 0) req.setArgs(args);
+        if (args.length > 0) {
+            req.setArgs(args);
+        }
         requestId = _sendRequest(req.encodeCBOR(), subscriptionId, gasLimit, donId);
     }
 
-    /// @notice Update the request settings
-    /// @dev Only callable by the owner of the contract
-    /// @param _source The new encoded CBOR request to be set. The request is encoded off-chain
-    /// @param _encryptedSecretsUrls The new secrets CBOR request to be set. The request is encoded off-chain
-    /// @param _subscriptionId The new subscription ID to be set
-    /// @param _gasLimit The new gas limit to be set
-
-    function updateRequest(
-        string memory _source,
-        bytes memory _encryptedSecretsUrls,
-        uint64 _subscriptionId,
-        uint32 _gasLimit,
-        bytes32 _donId
-    ) external onlyOwner {
-        source = _source;
+    function updateRequest(bytes calldata _encryptedSecretsUrls) external onlyOwner {
         encryptedSecretsUrls = _encryptedSecretsUrls;
-        subscriptionId = _subscriptionId;
-        gasLimit = _gasLimit;
-        donId = _donId;
-    }
-
-    /// @notice Update the request secrets in DON settings
-    function updateSecretsDon(uint8 _donHostedSecretsSlotID, uint64 _donHostedSecretsVersion) external {
-        secretsDonHostedSecretsSlotID[msg.sender] = _donHostedSecretsSlotID;
-        secretsDonHostedSecretsVersion[msg.sender] = _donHostedSecretsVersion;
     }
 
     /// @notice Processes the result of a fintech API request

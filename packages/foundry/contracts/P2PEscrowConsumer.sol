@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity 0.8.19;
 
 import {ResultsConsumer} from "./ResultsConsumer.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
@@ -68,7 +68,14 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
 
     // CONSTRUCTOR
 
-    constructor(address _router) ResultsConsumer(_router) {}
+    constructor(
+        address _router,
+        string memory _source,
+        bytes memory _encryptedSecretsUrls,
+        uint64 _subscriptionId,
+        uint32 _gasLimit,
+        bytes32 _donId
+    ) ResultsConsumer(_router, _source, _encryptedSecretsUrls, _subscriptionId, _gasLimit, _donId) {}
 
     // ACTIONS
 
@@ -93,7 +100,7 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         emit LiquidityAdded(_offerId, offers[_offerId]);
     }
 
-    function addOffer(uint256 _offerId, uint256 _amount, uint256 _deadline, IERC20 _token) public {
+    /*  function addOffer(uint256 _offerId, uint256 _amount, uint256 _deadline, IERC20 _token) public {
         if (_amount == 0) {
             revert Escrow__DepositAmountMustBeGreaterThanZero();
         }
@@ -116,7 +123,7 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
         );
 
         emit OfferAdded(_offerId, offers[_offerId]);
-    }
+    } */
 
     function takeDeal(uint256 _orderId, uint256 _offerId, uint256 _amount, uint256 _deadline, IERC20 _token) external {
         if (_amount == 0) {
@@ -154,12 +161,13 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
     /// @notice Request the result of a escrow from the external fintech API
     /// @param orderId The ID of the escrow
     /// @dev Uses Chainlink Functions via the ResultsConsumer contract
-    function _requestResolve(uint256 orderId) internal {
+    function requestArbitration(uint256 orderId) public {
         Escrow memory escrow = escrows[orderId];
 
         // Request the result of the escrow via ResultsConsumer contract
         // Store the Chainlink Functions request ID to prevent duplicate requests
-        pendingRequests[orderId] = _requestResult(orderId, escrow.dealAmount, escrow.startedAt, escrow.taker);
+        pendingRequests[orderId] =
+            _requestResult(orderId, escrow.offer.maker, escrow.taker, escrow.dealAmount, escrow.startedAt);
     }
 
     /// @notice Process the result of a escrow from the external fintech API
@@ -212,7 +220,7 @@ contract P2PEscrowConsumer is ResultsConsumer, AutomationCompatibleInterface {
     /// @dev Called back by Chainlink Automation when a escrow is ready to be resolved
     function performUpkeep(bytes calldata data) external override {
         uint256 orderId = abi.decode(data, (uint256));
-        _requestResolve(orderId);
+        requestArbitration(orderId);
     }
 
     // OWNER
