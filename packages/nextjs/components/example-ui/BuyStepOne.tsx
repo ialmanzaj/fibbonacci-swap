@@ -72,10 +72,6 @@ interface BuyStepsProps {
 const BuySteps: React.FC<BuyStepsProps> = ({ children }) => {
   const [activeStep, setActiveStep] = useState<number>(1);
 
-  const handleStepClick = (step: number) => {
-    setActiveStep(step);
-  };
-
   return (
     <div className="flex w-screen flex-wrap ">
       <div className="flex w-full flex-col md:w-1/2 mx-auto">
