@@ -26,12 +26,12 @@ contract FibbonacciEscrow is ResultsConsumer, AutomationCompatibleInterface {
         uint256 createdAt; // The timestamp of created
         uint256 finishedAt; // The timestamp of the escrow finished time
         uint256 deadline; // The total deadline of the deal
-        uint256 dealAmount; //  deal amount
+        uint256 dealAmount; //  crypto amount
+        uint256 totalPriceExchange; // the fiat amount
         address taker; // the buyer address
-        uint256 exchangeAmountWei; // the fiat amount
         address maker; // the seller address
         EscrowStatus status;
-        IERC20 token; // currency in custody
+        IERC20 currency; // currency in custody
     }
 
     // EVENTS
@@ -48,7 +48,7 @@ contract FibbonacciEscrow is ResultsConsumer, AutomationCompatibleInterface {
 
     // ERRORS
     error Escrow__DepositAmountMustBeGreaterThanZero();
-    error Escrow__ExchangeAmountMustBeGreaterThanZero();
+    error Escrow__PriceExchangetMustBeGreaterThanZero();
     error Escrow__IsZeroAddress();
     error Escrow__WithdrawalHasAlreadyBeenExecuted();
     error Escrow__IsAlreadyActive();
@@ -71,13 +71,13 @@ contract FibbonacciEscrow is ResultsConsumer, AutomationCompatibleInterface {
     function takeDeal(
         uint256 _orderId,
         uint256 _amount,
-        uint256 _exchangeAmountWei,
+        uint256 _totalPriceExchange,
         uint256 _deadline,
         address maker,
-        IERC20 _token
+        IERC20 _currency
     ) external {
-        if (_exchangeAmountWei == 0) {
-            revert Escrow__ExchangeAmountMustBeGreaterThanZero();
+        if (_totalPriceExchange == 0) {
+            revert Escrow__PriceExchangetMustBeGreaterThanZero();
         }
         if (_amount == 0) {
             revert Escrow__DepositAmountMustBeGreaterThanZero();
@@ -90,18 +90,19 @@ contract FibbonacciEscrow is ResultsConsumer, AutomationCompatibleInterface {
         activeEscrows.push(_orderId);
 
         //transfer stablecoin to contract
-        _token.safeTransferFrom(msg.sender, address(this), _amount);
+        _currency.safeTransferFrom(msg.sender, address(this), _amount);
 
         // set taker data
         escrows[_orderId].taker = msg.sender;
         escrows[_orderId].dealAmount = _amount;
-        escrows[_orderId].exchangeAmountWei = _exchangeAmountWei;
+        escrows[_orderId].totalPriceExchange = _totalPriceExchange;
 
         // update escrow data
         escrows[_orderId].maker = maker;
         escrows[_orderId].status = EscrowStatus.ACTIVE;
         escrows[_orderId].createdAt = block.timestamp;
         escrows[_orderId].deadline = _deadline;
+        escrows[_orderId].currency = _currency;
 
         emit EscrowAccepted(_orderId, escrows[_orderId]);
     }
