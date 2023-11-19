@@ -1,21 +1,8 @@
-import Link from "next/link";
-import { getAuthOptions } from "./api/auth/[...nextauth]";
-import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next";
-import { getServerSession } from "next-auth";
+import type { NextPage } from "next";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { ContractInteraction } from "~~/components/example-ui/ContractInteraction";
 
-//todo: how to implement this for protected urls
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  return {
-    props: {
-      session: await getServerSession(req, res, getAuthOptions(req)),
-    },
-  };
-};
-
 const Home: NextPage = () => {
-  
   return (
     <>
       <MetaHeader title="Fibbonacci Swap" description="Fibbonacci Swap is an on/off ramp fiat to crypto for LATAM.">
