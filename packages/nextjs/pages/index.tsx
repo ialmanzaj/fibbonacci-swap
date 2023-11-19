@@ -1,10 +1,9 @@
 import Link from "next/link";
-import type {GetServerSideProps, NextPage } from "next";
+import { getAuthOptions } from "./api/auth/[...nextauth]";
+import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next";
+import { getServerSession } from "next-auth";
 import { MetaHeader } from "~~/components/MetaHeader";
-import { ContractData } from "~~/components/example-ui/ContractData";
 import { ContractInteraction } from "~~/components/example-ui/ContractInteraction";
-import { getServerSession } from 'next-auth';
-import { getAuthOptions } from './api/auth/[...nextauth]';
 
 //todo: how to implement this for protected urls
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
