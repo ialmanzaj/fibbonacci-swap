@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ForexToken, Token } from "./selling";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useAccount } from "wagmi";
 import TokenSymbol from "~~/components/main/Token";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 type BuyingSideProps = {
   children: React.ReactNode;
@@ -28,9 +30,25 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) =>
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = async data => {
+    console.log(data);
+    await writeAsync({
+      args: ["0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", BigInt(data.amount)],
+    });
+  };
 
-  const [totalValue, setTotalValue] = useState("0$");
+  const { address } = useAccount();
+
+  const { writeAsync } = useScaffoldContractWrite({
+    contractName: "Balloons",
+    functionName: "approve",
+    args: [address, BigInt(0)],
+    onBlockConfirmation: txnReceipt => {
+      console.log("Transaction blockHash", txnReceipt.blockHash);
+    },
+  });
+
+  const [totalValue, setTotalValue] = useState("0");
   const [data, setData] = useState({
     amount: 0,
     price: 0,
@@ -41,7 +59,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) =>
       return;
     }
     if (!data.amount || !data.price || Number.isNaN(data.amount) || Number.isNaN(data.price)) {
-      setTotalValue("0$");
+      setTotalValue("0");
       return;
     }
     setTotalValue(formatCurrency(data.amount * data.price));
@@ -95,7 +113,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) =>
       <div className="stats bg-indigo-600">
         <div className="stat">
           <div className="stat-title">Valor total</div>
-          <div className="stat-value">{totalValue}</div>
+          <div className="stat-value">{totalValue} $</div>
         </div>
       </div>
       <div className="divider" />
