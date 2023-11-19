@@ -3201,6 +3201,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.39.0
     "@uniswap/sdk-core": ^4.0.1
     "@uniswap/v2-sdk": ^3.0.1
+    "@unkey/api": ^0.12.0
     autoprefixer: ^10.4.12
     belvo: ^0.28.0
     crypto: ^1.0.1
@@ -3222,6 +3223,7 @@ __metadata:
     react-copy-to-clipboard: ^5.1.0
     react-dom: ^18.2.0
     react-fast-marquee: ^1.3.5
+    react-hook-form: ^7.48.2
     react-hot-toast: ^2.4.0
     siwe: ^2
     tailwindcss: ^3.1.8
@@ -4045,6 +4047,13 @@ __metadata:
     tiny-invariant: ^1.1.0
     tiny-warning: ^1.0.3
   checksum: d4445af16bc203364074d2ded02231dd2ceff798b723ced760c19cfd171dafb71603efc42ac11c88cc9528de8e5439c1ac57d11671cf9eae6006fea158d02077
+  languageName: node
+  linkType: hard
+
+"@unkey/api@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "@unkey/api@npm:0.12.0"
+  checksum: e91d015ee2ff782fb50a0794eac75b89a6780f52e1c195859f33647a98b4971b3bd14baa9092cb0f004c0ca32e8cf6fd9cd703686258defeb76b74922a573b1b
   languageName: node
   linkType: hard
 
@@ -12479,6 +12488,15 @@ __metadata:
     react: ">= 16.8.0 || 18.0.0"
     react-dom: ">= 16.8.0 || 18.0.0"
   checksum: f448341d30ef417292d8f7618d4931190a6d4aa353fbd276da4dcecc49bb6a7a32962f9cc74fe0af2ea9617d7b453ed3efccf7a0e8709a8b66e04ec04f4ae18c
+  languageName: node
+  linkType: hard
+
+"react-hook-form@npm:^7.48.2":
+  version: 7.48.2
+  resolution: "react-hook-form@npm:7.48.2"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18
+  checksum: 39652d08f78f16e5234049ceeb794d8bcd4d146772aca99c6db8c5aea8926cd4a230d02098886a441074deefbc24ffcb5ed57bc7cb0009d950115f5b3e627f12
   languageName: node
   linkType: hard
 
