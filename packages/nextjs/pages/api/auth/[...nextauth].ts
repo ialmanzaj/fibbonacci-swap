@@ -4,7 +4,7 @@
 // can be used to get the session server-side with 'getServerSession'
 import { IncomingMessage } from "http";
 import { NextApiRequest, NextApiResponse } from "next";
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
@@ -18,22 +18,20 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
         try {
           const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
 
-          const nextAuthUrl =
-            process.env.NEXTAUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
-          if (!nextAuthUrl) {
+          const nextAuthUrl = new URL(
+            process.env.NEXTAUTH_URL || process.env.VERCEL_URL || `https://${process.env.VERCEL_URL}`,
+          );
+
+          const result = await siwe.verify({
+            signature: credentials?.signature || "",
+            domain: nextAuthUrl.host,
+            nonce: await getCsrfToken({ req: { headers: req.headers } }),
+          });
+
+          if (!result.success) {
             return null;
           }
 
-          const nextAuthHost = new URL(nextAuthUrl).host;
-          if (siwe.domain !== nextAuthHost) {
-            return null;
-          }
-
-          if (siwe.nonce !== (await getCsrfToken({ req: { headers: req.headers } }))) {
-            return null;
-          }
-
-          await siwe.verify({ signature: credentials?.signature || "" });
           const address = siwe.address;
 
           // Check if user exists
@@ -88,7 +86,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
 
   return {
     callbacks: {
-      async session({ session, token }) {
+      async session({ session, token }: { session: any; token: any }) {
         session.address = token.sub;
         session.user = {
           name: token.sub,

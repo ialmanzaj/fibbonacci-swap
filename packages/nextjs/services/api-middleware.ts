@@ -1,8 +1,9 @@
+/* eslint-disable */
 import { verifyKey } from "@unkey/api";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export function withApiKey(
-  handler: (request: NextApiRequest, res: NextApiResponse) => NextApiResponse | Promise<NextApiResponse>,
+  handler: (req: NextApiRequest, res: NextApiResponse) => NextApiResponse | Promise<NextApiResponse>,
 ) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const requestHeaders = new Headers(req.headers);
