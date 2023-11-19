@@ -8,7 +8,7 @@ const POST = withApiKey(async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { taker, maker, amount, startedAt, link, account } = req.body;
+  const { taker, maker, amount, startedAt } = req.body;
 
   const newestDate = new Date(startedAt * 1000);
   const newestDateStr = newestDate.toISOString().slice(0, 10);
@@ -22,7 +22,13 @@ const POST = withApiKey(async (req: NextApiRequest, res: NextApiResponse) => {
     where: {
       address: maker,
     },
+    include: {
+      keys: true,
+    },
   });
+
+  const link = makerUser?.keys[0].link || "";
+  const account = makerUser?.keys[0].account;
 
   //todo: get bank account details to validate against
   const takerUser = await db.user.findUnique({
