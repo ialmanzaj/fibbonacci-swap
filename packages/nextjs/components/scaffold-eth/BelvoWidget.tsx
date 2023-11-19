@@ -4,7 +4,14 @@ import { BelvoConnectButton } from "~~/components/scaffold-eth";
 interface WidgetProps {
   src?: string;
 }
-
+// Assuming belvoSDK is a global variable defined elsewhere
+declare global {
+  interface Window {
+    belvoSDK: {
+      createWidget: (access: any, config: any) => any; // Adjust types as needed
+    };
+  }
+}
 const BankingWidget: React.FC<WidgetProps> = ({ src = "https://cdn.belvo.io/belvo-widget-1-stable.js" }) => {
   const [buttonText, setbuttonText] = useState("Conecta cuenta de banco");
 

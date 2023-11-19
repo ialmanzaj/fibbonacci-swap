@@ -1,26 +1,11 @@
 import { useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
-import CopyToClipboard from "react-copy-to-clipboard";
-import { useDisconnect, useSwitchNetwork } from "wagmi";
-import {
-  ArrowLeftOnRectangleIcon,
-  ArrowTopRightOnSquareIcon,
-  ArrowsRightLeftIcon,
-  CheckCircleIcon,
-  ChevronDownIcon,
-  DocumentDuplicateIcon,
-  QrCodeIcon,
-} from "@heroicons/react/24/outline";
-import { Address, Balance, BlockieAvatar } from "~~/components/scaffold-eth";
-import { useNetworkColor } from "~~/hooks/scaffold-eth";
-import { getBlockExplorerAddressLink, getTargetNetwork } from "~~/utils/scaffold-eth";
 
-/**
- * Custom Wagmi Connect Button (watch balance + custom design)
- */
-export const BelvoConnectButton = ({ text = "", launchWidget }) => {
-  const { disconnect } = useDisconnect();
-  const [addressCopied, setAddressCopied] = useState(false);
+type BelvoConnectButtonProps = {
+  text?: string;
+  launchWidget: () => void;
+};
+
+export const BelvoConnectButton: React.FC<BelvoConnectButtonProps> = ({ text, launchWidget }) => {
   const [connected, setConnected] = useState(false);
   console.log(text);
   if (!connected) {
