@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ForexToken, Token } from "./selling";
+import { Currency } from "./selling";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import TokenSymbol from "~~/components/main/Token";
@@ -7,8 +7,8 @@ import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 type BuyingSideProps = {
   children: React.ReactNode;
-  token: Token;
-  currency: ForexToken;
+  currencyIn: Currency;
+  currencyOut: Currency;
 };
 type Inputs = {
   amount: number;
@@ -17,14 +17,14 @@ type Inputs = {
   max: number;
 };
 
-function formatCurrency(value: number, locale: string = "en-US", currency: string = "COP"): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: currency,
-  }).format(value);
-}
+const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyOut }) => {
+  function formatCurrency(amount: number, locale: string = "en-US", currency: string): string {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: currency,
+    }).format(amount);
+  }
 
-const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) => {
   const {
     register,
     handleSubmit,
@@ -62,7 +62,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) =>
       setTotalValue("0");
       return;
     }
-    setTotalValue(formatCurrency(data.amount * data.price));
+    setTotalValue(formatCurrency(data.amount / data.price, "en-US", currencyOut.symbol));
   }, [data]);
 
   return (
@@ -73,13 +73,13 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) =>
       <div className="w-full flex flex-row gap-5 items-center">
         <div className="w-full flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
-            <h2>Valor total de compra</h2>
-            <TokenSymbol symbol={currency.symbol} name={currency.name} />
+            <h2>Envias</h2>
+            <TokenSymbol symbol={currencyIn.image} name={currencyIn.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">
               {errors.amount && <span className="text-red-500 label-text">Required</span>}
-              <span className="label-text-alt">Cantidad de dinero para compra</span>
+              <span className="label-text-alt">Cuanto vas a comprar?</span>
             </label>
             <input
               {...register("amount", { required: true })}
@@ -92,13 +92,13 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) =>
         </div>
         <div className="w-full  flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
-            <h2>Valor</h2>
-            <TokenSymbol symbol={token.symbol} name={token.name} />
+            <h2>Recibes</h2>
+            <TokenSymbol symbol={currencyOut.image} name={currencyOut.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">
               {errors.price && <span className="text-red-500 label-text">Required</span>}
-              <span className="label-text-alt">Valor de compra de cada token</span>
+              <span className="label-text-alt">Precio de compra</span>
             </label>
             <input
               {...register("price", { required: true })}
@@ -112,8 +112,10 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, token, currency }) =>
       </div>
       <div className="stats bg-indigo-600">
         <div className="stat">
-          <div className="stat-title">Valor total</div>
-          <div className="stat-value">{totalValue} $</div>
+          <div className="stat-title">Vas a recibir</div>
+          <div className="stat-value text-xl">
+            {totalValue} {currencyOut.name}
+          </div>
         </div>
       </div>
       <div className="divider" />

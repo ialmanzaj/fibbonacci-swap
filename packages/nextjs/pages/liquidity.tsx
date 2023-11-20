@@ -11,12 +11,15 @@ function Liquidity() {
 
   const UsdtToken = {
     name: "USDT",
-    symbol: "https://cdn.via.exchange/tokens/USDT.svg",
+    symbol: "USD",
+    image: "https://cdn.via.exchange/tokens/USDT.svg",
+    forex: false,
   };
 
   const COP = {
-    name: "COP",
-    symbol: "https://wise.com/web-art/assets/flags/cop.svg",
+    name: "Pesos colombianos",
+    symbol: "COP",
+    image: "https://wise.com/web-art/assets/flags/cop.svg",
     forex: true,
   };
 
@@ -34,11 +37,11 @@ function Liquidity() {
           <SwapButtons isSelling={isSelling} setIsSelling={setIsSelling} />
 
           {isSelling ? (
-            <SellingSide token={UsdtToken} currency={COP}>
+            <SellingSide currencyIn={UsdtToken} currencyOut={COP}>
               <BelvoWidget />
             </SellingSide>
           ) : (
-            <BuyingSide token={UsdtToken} currency={COP}>
+            <BuyingSide currencyIn={COP} currencyOut={UsdtToken}>
               <BelvoWidget />
             </BuyingSide>
           )}

@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, useController, useForm } from "react-hook-form";
 import Token from "~~/components/main/Token";
 
+export type Currency = {
+  name: string;
+  symbol: string;
+  image: string;
+  forex: boolean;
+};
+
 type Inputs = {
   amount: number;
   price: number;
@@ -9,18 +16,10 @@ type Inputs = {
   max: number;
 };
 
-export type Token = {
-  name: string;
-  symbol: string;
-};
-
-export type ForexToken = {
-  forex: boolean;
-} & Token;
 type SellingSideProps = {
   children: React.ReactNode;
-  token: Token;
-  currency: ForexToken;
+  currencyIn: Currency;
+  currencyOut: Currency;
 };
 
 function formatCurrency(value: number, locale: string = "en-US", currency: string = "COP"): string {
@@ -30,7 +29,7 @@ function formatCurrency(value: number, locale: string = "en-US", currency: strin
   }).format(value);
 }
 
-const SellingSide: React.FC<SellingSideProps> = ({ children, token, currency }) => {
+const SellingSide: React.FC<SellingSideProps> = ({ children, currencyIn, currencyOut }) => {
   const {
     register,
     control,
@@ -55,7 +54,7 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, token, currency }) 
       setTotalValue("0$");
       return;
     }
-    setTotalValue(formatCurrency(data.amount * data.price));
+    setTotalValue(formatCurrency(data.amount * data.price, "en-US", currencyOut.symbol));
   }, [data]);
   return (
     <form
@@ -65,13 +64,13 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, token, currency }) 
       <div className="w-full flex flex-row gap-5 items-center">
         <div className="w-full flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
-            <h2>Vendes</h2>
-            <Token symbol={token.symbol} name={token.name} />
+            <h2>Envias</h2>
+            <Token symbol={currencyIn.image} name={currencyIn.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">
               {errors.amount && <span className="text-red-500 label-text">Required</span>}
-              <span className="label-text-alt">Cantidad de tokens en venta</span>
+              <span className="label-text-alt">Cuanto vas a vender?</span>
             </label>
             <input
               {...register("amount", { required: true })}
@@ -84,13 +83,13 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, token, currency }) 
         </div>
         <div className="w-full  flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
-            <h2>Valor</h2>
-            <Token symbol={currency.symbol} name={currency.name} />
+            <h2>Recibes</h2>
+            <Token symbol={currencyOut.image} name={currencyOut.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">
               {errors.price && <span className="text-red-500 label-text">Required</span>}
-              <span className="label-text-alt">Valor de venta de cada token</span>
+              <span className="label-text-alt">Precio de venta</span>
             </label>
 
             <input
@@ -105,8 +104,8 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, token, currency }) 
       </div>
       <div className="stats bg-indigo-600">
         <div className="stat">
-          <div className="stat-title">Valor total</div>
-          <div className="stat-value">{totalValue}</div>
+          <div className="stat-title">Vas a recibir</div>
+          <div className="stat-value text-xl">{totalValue}</div>
         </div>
       </div>
       <div className="divider" />
