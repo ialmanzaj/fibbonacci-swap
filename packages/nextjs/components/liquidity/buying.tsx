@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Currency } from "./selling";
+import { Currency } from "../currencies";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import TokenSymbol from "~~/components/main/Token";
@@ -18,7 +18,7 @@ type Inputs = {
 };
 
 const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyOut }) => {
-  function formatCurrency(amount: number, locale: string = "en-US", currency: string): string {
+  function formatCurrency(amount: number, locale: string = "en-US", currency: string = "USD"): string {
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: currency,
@@ -62,7 +62,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
       setTotalValue("0");
       return;
     }
-    setTotalValue(formatCurrency(data.amount / data.price, "en-US", currencyOut.symbol));
+    setTotalValue(formatCurrency(data.amount / data.price));
   }, [data]);
 
   return (
@@ -74,7 +74,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
         <div className="w-full flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
             <h2>Envias</h2>
-            <TokenSymbol symbol={currencyIn.image} name={currencyIn.symbol} />
+            <TokenSymbol icon={currencyIn.icon} name={currencyIn.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">
@@ -93,7 +93,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
         <div className="w-full  flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
             <h2>Recibes</h2>
-            <TokenSymbol symbol={currencyOut.image} name={currencyOut.symbol} />
+            <TokenSymbol icon={currencyOut.icon} name={currencyOut.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">
@@ -114,7 +114,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
         <div className="stat">
           <div className="stat-title">Vas a recibir</div>
           <div className="stat-value text-xl">
-            {totalValue} {currencyOut.name}
+            {totalValue} {currencyOut.symbol}
           </div>
         </div>
       </div>

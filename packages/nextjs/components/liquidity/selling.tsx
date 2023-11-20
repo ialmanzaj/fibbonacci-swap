@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
-import { SubmitHandler, useController, useForm } from "react-hook-form";
+import { Currency } from "../currencies";
+import { SubmitHandler, useForm } from "react-hook-form";
 import Token from "~~/components/main/Token";
-
-export type Currency = {
-  name: string;
-  symbol: string;
-  image: string;
-  forex: boolean;
-};
 
 type Inputs = {
   amount: number;
@@ -54,7 +48,7 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, currencyIn, currenc
       setTotalValue("0$");
       return;
     }
-    setTotalValue(formatCurrency(data.amount * data.price, "en-US", currencyOut.symbol));
+    setTotalValue(formatCurrency(data.amount * data.price));
   }, [data]);
   return (
     <form
@@ -65,7 +59,7 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, currencyIn, currenc
         <div className="w-full flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
             <h2>Envias</h2>
-            <Token symbol={currencyIn.image} name={currencyIn.symbol} />
+            <Token icon={currencyIn.icon} name={currencyIn.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">
@@ -84,7 +78,7 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, currencyIn, currenc
         <div className="w-full  flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between">
             <h2>Recibes</h2>
-            <Token symbol={currencyOut.image} name={currencyOut.symbol} />
+            <Token icon={currencyOut.icon} name={currencyOut.symbol} />
           </div>
           <div className="form-control w-full max-w-xs">
             <label className="label">

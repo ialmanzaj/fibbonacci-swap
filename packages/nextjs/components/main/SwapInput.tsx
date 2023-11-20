@@ -1,27 +1,22 @@
 import React from "react";
 import Image from "next/image";
+import { Currency } from "../currencies";
 import Token from "./Token";
 
-type Token = {
-  name: string;
-  symbol: string;
-  forex?: boolean;
-};
-
 function SwapInput({
-  value,
+  amount,
   handleOnChange,
   data,
   isLocked,
   setValue,
-  token,
+  currency,
 }: {
-  value: number;
+  amount: number;
   handleOnChange?: any;
   data: bigint;
   isLocked?: boolean;
   setValue?: any;
-  token: Token;
+  currency: Currency;
 }) {
   return (
     <div className="relative flex justify-between w-full  p-1.5 transition-all  rounded-[20px] border h-[131px] px-4 py-6 md:p-6 items-center dark:bg-formActive/[0.08] dark:border-[#272D67] border-[#272D67] bg-[#18181B]">
@@ -38,7 +33,7 @@ function SwapInput({
             autoComplete="off"
             autoCorrect="off"
             type="number"
-            value={value}
+            value={amount}
             pattern="^[0-9]*[.,]?[0-9]*$"
             onChange={handleOnChange ? handleOnChange : () => {}}
             placeholder="0"
@@ -50,10 +45,10 @@ function SwapInput({
           />
         </div>
         <div className="flex min-w-max flex-col items-end justify-between gap-4 text-left overflow-hidden">
-          <Token name={token.name} symbol={token.symbol} />
+          <Token name={currency.symbol} icon={currency.icon} />
           <span className="text-sm dark:text-white-400 leading-none text-[#9ca3af]">
             <span className="dark:text-white/80 text-[#141418CC] font-semibold"></span>
-            {!isLocked && !token.forex && (
+            {!isLocked && !currency.forex && (
               <button
                 type="button"
                 onClick={() => data && setValue && setValue((data / BigInt(10 ** 18))?.toString())}

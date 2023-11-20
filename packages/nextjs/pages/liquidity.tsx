@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { MetaHeader } from "~~/components/MetaHeader";
+import { COP, USDT } from "~~/components/currencies";
 import BuyingSide from "~~/components/liquidity/buying";
 import SellingSide from "~~/components/liquidity/selling";
 import { SwapButtons } from "~~/components/main/SwapButtons";
@@ -8,20 +9,6 @@ import BelvoWidget from "~~/components/scaffold-eth/BelvoWidget";
 function Liquidity() {
   const [isSelling, setIsSelling] = useState(false);
   const [rangeValue, setRangeValue] = useState(0);
-
-  const UsdtToken = {
-    name: "USDT",
-    symbol: "USD",
-    image: "https://cdn.via.exchange/tokens/USDT.svg",
-    forex: false,
-  };
-
-  const COP = {
-    name: "Pesos colombianos",
-    symbol: "COP",
-    image: "https://wise.com/web-art/assets/flags/cop.svg",
-    forex: true,
-  };
 
   return (
     <>
@@ -37,11 +24,11 @@ function Liquidity() {
           <SwapButtons isSelling={isSelling} setIsSelling={setIsSelling} />
 
           {isSelling ? (
-            <SellingSide currencyIn={UsdtToken} currencyOut={COP}>
+            <SellingSide currencyIn={USDT} currencyOut={COP}>
               <BelvoWidget />
             </SellingSide>
           ) : (
-            <BuyingSide currencyIn={COP} currencyOut={UsdtToken}>
+            <BuyingSide currencyIn={COP} currencyOut={USDT}>
               <BelvoWidget />
             </BuyingSide>
           )}
