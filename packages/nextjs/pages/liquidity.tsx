@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { MetaHeader } from "~~/components/MetaHeader";
+import BelvoWidget from "~~/components/belvo/BelvoWidget";
 import { COP, USDT } from "~~/components/currencies";
 import BuyingSide from "~~/components/liquidity/buying";
 import SellingSide from "~~/components/liquidity/selling";
 import { SwapButtons } from "~~/components/main/SwapButtons";
-import BelvoWidget from "~~/components/belvo/BelvoWidget";
 
 function Liquidity() {
   const [isSelling, setIsSelling] = useState(false);

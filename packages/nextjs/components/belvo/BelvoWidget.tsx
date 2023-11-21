@@ -18,7 +18,7 @@ const BankingWidget: React.FC<WidgetProps> = ({ src = "https://cdn.belvo.io/belv
   // Function to call your server-side to generate the access_token and retrieve your access token
   async function getAccessToken(): Promise<{ access: string }> {
     // Make sure to change /get-access-token to point to your server-side.
-    return fetch("/api/access_token", {
+    return fetch("/api/belvo/access_token", {
       method: "GET",
     })
       .then(response => response.json())
