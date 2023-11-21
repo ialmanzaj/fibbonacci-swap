@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Currency } from "../currencies";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useAccount } from "wagmi";
 import Token from "~~/components/main/Token";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 type Inputs = {
   amount: number;
@@ -24,6 +26,8 @@ function formatCurrency(value: number, locale: string = "en-US", currency: strin
 }
 
 const SellingSide: React.FC<SellingSideProps> = ({ children, currencyIn, currencyOut }) => {
+  const { address } = useAccount();
+
   const {
     register,
     control,
@@ -32,12 +36,26 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, currencyIn, currenc
   } = useForm<Inputs>({
     mode: "onChange",
   });
-  const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = async data => {
+    console.log(data);
+    await writeAsync({
+      args: ["0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", BigInt(data.amount)],
+    });
+  };
 
   const [totalValue, setTotalValue] = useState("0$");
   const [data, setData] = useState({
     amount: 0,
     price: 0,
+  });
+
+  const { writeAsync } = useScaffoldContractWrite({
+    contractName: "Balloons",
+    functionName: "approve",
+    args: [address, BigInt(0)],
+    onBlockConfirmation: txnReceipt => {
+      console.log("Transaction blockHash", txnReceipt.blockHash);
+    },
   });
 
   useEffect(() => {
