@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Currency } from "../currencies";
+import { utils } from "ethers";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import TokenSymbol from "~~/components/main/Token";
@@ -17,13 +18,31 @@ type Inputs = {
   max: number;
 };
 
+function formatCurrency(amount: number, locale: string = "en-US", currency: string = "USD"): string {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: currency,
+  }).format(amount);
+}
+
+function getDeadline(): Number {
+  // Get current time in UNIX timestamp (milliseconds)
+  const currentTime = new Date().getTime();
+
+  // Add 10 minutes (10 * 60 * 1000 milliseconds) to the current time
+  const futureTime = currentTime + 10 * 60 * 1000;
+
+  // Convert to UNIX timestamp (seconds)
+  const futureUnixTimestamp = Math.floor(futureTime / 1000);
+  return futureUnixTimestamp;
+}
+
 const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyOut }) => {
-  function formatCurrency(amount: number, locale: string = "en-US", currency: string = "USD"): string {
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: currency,
-    }).format(amount);
-  }
+  const [total, setTotal] = useState("0");
+  const [data, setData] = useState({
+    amount: 0,
+    price: 0,
+  });
 
   const {
     register,
@@ -32,37 +51,36 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async data => {
     console.log(data);
-    await writeAsync({
-      args: ["0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", BigInt(data.amount)],
-    });
+    const { amount, price, min, max } = data;
+    const totalWei = BigInt(((amount / price) * 10 ** 2).toFixed(0)) * 10n ** 16n;
+    fetch("/api/order/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        total: totalWei.toString(),
+        amount: amount,
+        price: price,
+        min: min,
+        max: max,
+        expires: getDeadline(),
+      }),
+    })
+      .then(response => response.json())
+      .then(data => data)
+      .catch(error => console.error("Error:", error));
   };
-
-  const { address } = useAccount();
-
-  const { writeAsync } = useScaffoldContractWrite({
-    contractName: "Balloons",
-    functionName: "approve",
-    args: [address, BigInt(0)],
-    onBlockConfirmation: txnReceipt => {
-      console.log("Transaction blockHash", txnReceipt.blockHash);
-    },
-  });
-
-  const [totalValue, setTotalValue] = useState("0");
-  const [data, setData] = useState({
-    amount: 0,
-    price: 0,
-  });
 
   useEffect(() => {
     if (errors.amount || errors.price) {
       return;
     }
     if (!data.amount || !data.price || Number.isNaN(data.amount) || Number.isNaN(data.price)) {
-      setTotalValue("0");
+      setTotal("0");
       return;
     }
-    setTotalValue(formatCurrency(data.amount / data.price));
+    setTotal(formatCurrency(data.amount / data.price));
   }, [data]);
 
   return (
@@ -114,7 +132,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
         <div className="stat">
           <div className="stat-title">Vas a recibir</div>
           <div className="stat-value text-xl">
-            {totalValue} {currencyOut.symbol}
+            {total} {currencyOut.symbol}
           </div>
         </div>
       </div>
