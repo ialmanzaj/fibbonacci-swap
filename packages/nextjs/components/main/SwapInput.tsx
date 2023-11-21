@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { Currency } from "../currencies";
 import Token from "./Token";
 
