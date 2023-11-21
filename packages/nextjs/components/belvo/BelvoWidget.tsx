@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BelvoConnectButton } from "~~/components/scaffold-eth";
+import { BelvoConnectButton } from "./BelvoConnectButton";
 
 interface WidgetProps {
   src?: string;
@@ -31,6 +31,19 @@ const BankingWidget: React.FC<WidgetProps> = ({ src = "https://cdn.belvo.io/belv
     // such as associate it with your registered user in your database.
     console.log("success", institution, link);
     setbuttonText(`Conectado a ${institution}`);
+    return fetch("/api/belvo/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        linkId: link,
+        institution: institution,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => data)
+      .catch(error => console.error("Error:", error));
   };
 
   const onExitCallbackFunction = (data: any) => {

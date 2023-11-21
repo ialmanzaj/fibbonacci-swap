@@ -2,9 +2,11 @@
 // with added process.env.VERCEL_URL detection to support preview deployments
 // and with auth option logic extracted into a 'getAuthOptions' function so it
 // can be used to get the session server-side with 'getServerSession'
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { IncomingMessage } from "http";
+import { type GetServerSidePropsContext } from "next";
 import { NextApiRequest, NextApiResponse } from "next";
-import NextAuth, { NextAuthOptions, Session } from "next-auth";
+import NextAuth, { NextAuthOptions, Session, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
@@ -87,7 +89,6 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
   return {
     callbacks: {
       async session({ session, token }: { session: any; token: any }) {
-        session.address = token.sub;
         session.user = {
           name: token.sub,
         };
@@ -121,3 +122,9 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
 
   return await NextAuth(req, res, authOptions);
 }
+
+export const getServerAuthSession = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Changed from authOptions to authOption(ctx)
+  // This allows use to retrieve the csrf token to verify as the nonce
+  return getServerSession(req, res, getAuthOptions(req));
+};
