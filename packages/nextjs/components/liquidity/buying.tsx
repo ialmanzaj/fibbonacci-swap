@@ -5,6 +5,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import TokenSymbol from "~~/components/main/Token";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { getFutureTimeInUnix } from "~~/utils/scaffold-eth/time";
 
 type BuyingSideProps = {
   children: React.ReactNode;
@@ -23,18 +24,6 @@ function formatCurrency(amount: number, locale: string = "en-US", currency: stri
     style: "currency",
     currency: currency,
   }).format(amount);
-}
-
-function getDeadline(): Number {
-  // Get current time in UNIX timestamp (milliseconds)
-  const currentTime = new Date().getTime();
-
-  // Add 10 minutes (10 * 60 * 1000 milliseconds) to the current time
-  const futureTime = currentTime + 10 * 60 * 1000;
-
-  // Convert to UNIX timestamp (seconds)
-  const futureUnixTimestamp = Math.floor(futureTime / 1000);
-  return futureUnixTimestamp;
 }
 
 const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyOut }) => {
@@ -64,7 +53,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
         price: price,
         min: min,
         max: max,
-        expires: getDeadline(),
+        expires: getFutureTimeInUnix(new Date()),
       }),
     })
       .then(response => response.json())
