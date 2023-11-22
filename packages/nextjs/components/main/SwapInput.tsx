@@ -1,18 +1,19 @@
 import React from "react";
 import { Currency } from "../currencies";
 import Token from "./Token";
+import { BigNumber } from "ethers";
 
 function SwapInput({
   amount,
   handleOnChange,
-  data,
+  balance,
   isLocked,
   setValue,
   currency,
 }: {
-  amount: number;
+  amount?: BigNumber;
+  balance?: BigNumber;
   handleOnChange?: any;
-  data: bigint;
   isLocked?: boolean;
   setValue?: any;
   currency: Currency;
@@ -50,11 +51,11 @@ function SwapInput({
             {!isLocked && !currency.forex && (
               <button
                 type="button"
-                onClick={() => data && setValue && setValue((data / BigInt(10 ** 18))?.toString())}
+                onClick={() => balance && setValue && setValue((balance / BigInt(10 ** 18))?.toString())}
                 className="test-sm ml-1 rounded-lg px-1 leading-none uppercase"
               >
                 <span className="text-gray-500 font-light">
-                  {data ? (data / BigInt(10 ** 18))?.toString() : "Loading.."}
+                  {balance ? (balance / BigInt(10 ** 18))?.toString() : "Loading.."}
                 </span>{" "}
                 Max
               </button>

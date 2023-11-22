@@ -1,43 +1,101 @@
 import React, { useEffect, useState } from "react";
 import { COP, USDT } from "../currencies";
 import SwapInput from "../main/SwapInput";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { BigNumber } from "ethers";
+import { formatEther } from "ethers/lib/utils.js";
+import { useAccount } from "wagmi";
+import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { multiplyTo1e18 } from "~~/utils/scaffold-eth/priceInWei";
+import { getFutureTimeInUnix } from "~~/utils/scaffold-eth/time";
 
-function Selling({ data }: any) {
-  const [value, setValue] = useState<number | null>(null);
+function Selling({ orders }: any) {
+  const { address: connectedAddress } = useAccount();
+  const [exchangedValue, setExchangedValue] = useState(0);
+  const [amountToSell, setAmountToSell] = useState<string | BigNumber>("");
+  const [isApproved, setIsApproved] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState(orders[0]);
+  const deadLine = getFutureTimeInUnix(new Date());
+  console.log(currentOrder);
 
-  const { writeAsync } = useScaffoldContractWrite({
+  const { data: FibbonacciEscrow } = useDeployedContractInfo("FibbonacciEscrow");
+  const { data: Balloons } = useDeployedContractInfo("Balloons");
+
+  const { data: balanceBallons } = useScaffoldContractRead({
+    contractName: "Balloons",
+    functionName: "balanceOf",
+    args: [connectedAddress],
+    watch: true,
+  });
+
+  const { writeAsync: approveTokens } = useScaffoldContractWrite({
     contractName: "Balloons",
     functionName: "approve",
-    args: ["0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", BigInt(value * 10 ** 16)],
+    args: [FibbonacciEscrow?.address, multiplyTo1e18(amountToSell)],
   });
-  const handleSubmit = async () => {
-    await writeAsync();
-  };
-  const [exchangedValue, setExchangedValue] = useState(0);
+
+  const { writeAsync: escrowTokens } = useScaffoldContractWrite({
+    contractName: "FibbonacciEscrow",
+    functionName: "takeDeal",
+    args: [
+      currentOrder.id,
+      multiplyTo1e18(amountToSell),
+      currentOrder.priceTotalExchange,
+      BigNumber.from(deadLine),
+      "0x02C48c159FDfc1fC18BA0323D67061dE1dEA329F",
+      Balloons?.address,
+    ],
+  });
+
   useEffect(() => {
-    if (value) {
-      setExchangedValue(value * 4200);
+    if (amountToSell) {
+      setExchangedValue(amountToSell * orders[0].pricePerCoinExchange);
     }
-  }, [value]);
+  }, [amountToSell]);
+
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <div className="dark:bg-form-gradient rounded-[20px] bg-light-form-gradient">
         <SwapInput
           currency={USDT}
-          setValue={setValue}
-          amount={value as number}
-          handleOnChange={e => setValue(e.target.value)}
-          data={data}
+          setValue={setAmountToSell}
+          amount={amountToSell}
+          handleOnChange={e => setAmountToSell(e.target.value)}
+          balance={balanceBallons}
         />
-        <SwapInput currency={COP} isLocked setValue={setValue} amount={exchangedValue} data={data} />
+        <SwapInput
+          currency={COP}
+          isLocked
+          setValue={setAmountToSell}
+          amount={exchangedValue}
+          balance={balanceBallons}
+        />
       </div>
       <div className="text-sm leading-4 w-full">
-        <button className="text-sm py-5 px-4 rounded-lg  focus:ring-2 bg-indigo-800 text-white duration-200 focus:ring-offset-2 focus:ring-white  w-full inline-flex items-center justify-center ring-1 ring-transparent">
-          Vender
+        <button
+          className={`text-sm py-5 px-4 rounded-lg  focus:ring-2 bg-indigo-800 text-white duration-200 focus:ring-offset-2 focus:ring-white  w-full inline-flex items-center justify-center ring-1 ring-transparent ${
+            isApproved ? "hidden" : "block"
+          }`}
+          onClick={async () => {
+            await approveTokens();
+            setIsApproved(true);
+          }}
+        >
+          Approve Tokens
+        </button>
+
+        <button
+          className={`text-sm py-5 px-4 rounded-lg  focus:ring-2 bg-indigo-800 text-white duration-200 focus:ring-offset-2 focus:ring-white  w-full inline-flex items-center justify-center ring-1 ring-transparent ${
+            isApproved ? "block" : "hidden"
+          }`}
+          onClick={async () => {
+            await escrowTokens();
+            setIsApproved(false);
+          }}
+        >
+          Sell Tokens
         </button>
       </div>
-    </form>
+    </div>
   );
 }
 
