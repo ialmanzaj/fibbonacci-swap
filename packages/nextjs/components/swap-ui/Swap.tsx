@@ -6,14 +6,6 @@ import { useDeployedContractInfo, useScaffoldContractRead } from "~~/hooks/scaff
 const Swap = ({ orders }) => {
   const [isSelling, setIsSelling] = useState(false);
 
-  const { data: activeEscrows } = useScaffoldContractRead({
-    contractName: "FibbonacciEscrow",
-    functionName: "activeEscrows",
-    args: [],
-    watch: true,
-  });
-  console.log(activeEscrows);
-
   return (
     <div className="flex relative pb-10 bg-black">
       <main className="relative my-auto justify-center w-full px-5 flex flex-col items-center">
