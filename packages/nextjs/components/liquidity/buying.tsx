@@ -8,7 +8,7 @@ import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { getFutureTimeInUnix } from "~~/utils/scaffold-eth/time";
 
 type BuyingSideProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   currencyIn: Currency;
   currencyOut: Currency;
 };

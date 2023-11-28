@@ -13,7 +13,7 @@ type Inputs = {
 };
 
 type SellingSideProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   currencyIn: Currency;
   currencyOut: Currency;
 };

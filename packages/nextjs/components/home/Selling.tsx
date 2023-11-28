@@ -53,7 +53,7 @@ function Selling({ orders }: any) {
   }, [amountToSell]);
 
   return (
-    <div>
+    <section>
       <div className="dark:bg-form-gradient rounded-[20px] bg-light-form-gradient">
         <SwapInput
           currency={USDT}
@@ -80,7 +80,7 @@ function Selling({ orders }: any) {
             setIsApproved(true);
           }}
         >
-          Approve Tokens
+          Approve
         </button>
 
         <button
@@ -95,7 +95,7 @@ function Selling({ orders }: any) {
           Sell Tokens
         </button>
       </div>
-    </div>
+    </section>
   );
 }
 

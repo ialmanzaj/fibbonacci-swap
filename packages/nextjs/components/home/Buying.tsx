@@ -23,7 +23,7 @@ function Buying({ orders }: any) {
   }, [amountIn]);
 
   return (
-    <form>
+    <section>
       <div className="dark:bg-form-gradient rounded-[20px] bg-light-form-gradient">
         <SwapInput
           currency={COP}
@@ -39,7 +39,7 @@ function Buying({ orders }: any) {
           Comprar
         </button>
       </div>
-    </form>
+    </section>
   );
 }
 
