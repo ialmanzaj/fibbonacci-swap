@@ -3,18 +3,8 @@ import { MetaHeader } from "~~/components/MetaHeader";
 import Swap from "~~/components/swap-ui/Swap";
 import { db } from "~~/services/db";
 
-export async function getServerSideProps() {
-  const orders = JSON.parse(JSON.stringify(await db.order.findMany()));
-  console.log(orders);
-  return {
-    props: {
-      orders: orders,
-    },
-  };
-}
-
-const Home: NextPage = ({ orders }) => {
-  console.log(orders);
+function Home({ data }) {
+  console.log(data);
   return (
     <>
       <MetaHeader title="Fibbonacci Swap" description="Fibbonacci Swap is an on/off ramp fiat to crypto for LATAM.">

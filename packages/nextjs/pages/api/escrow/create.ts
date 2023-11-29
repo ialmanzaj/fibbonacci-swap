@@ -10,18 +10,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (!session) {
     res.status(401);
   }
-  const { total, amount, price, min, max, expires } = req.body;
-  const userId = session?.user?.name || "";
-  const order = await db.order.create({
-    data: {
-      userId: userId,
-      amountExchange: amount,
-      priceTotalExchange: total,
-      pricePerCoinExchange: price,
-      minAmountExchange: min,
-      maxAmountExchange: max,
-      expires: expires,
+  const { orderId, makerId, taker, dealAmount, totalPriceExchange, deadline } = req.body;
+  const takerUser = await db.user.findUnique({
+    where: {
+      address: taker,
     },
   });
-  res.json(order);
+  const escrow = await db.escrow.create({
+    data: {
+      orderId: orderId,
+      makerId: makerId,
+      takerId: takerUser?.id || "",
+      escrowStatus: "",
+      dealAmount: dealAmount,
+      totalPriceExchange: totalPriceExchange,
+      deadline: deadline,
+    },
+  });
+  res.json(escrow);
 }

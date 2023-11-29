@@ -3,25 +3,19 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { db } from "~~/services/db";
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
+  if (req.method !== "GET") {
     res.status(405).json({ error: "Method Not Allowed" });
   }
   const session = await getServerAuthSession(req, res);
   if (!session) {
     res.status(401);
   }
-  const { total, amount, price, min, max, expires } = req.body;
-  const userId = session?.user?.name || "";
-  const order = await db.order.create({
-    data: {
-      userId: userId,
-      amountExchange: amount,
-      priceTotalExchange: total,
-      pricePerCoinExchange: price,
-      minAmountExchange: min,
-      maxAmountExchange: max,
-      expires: expires,
+
+  const escrows = await db.escrow.findMany({
+    where: {
+      takerId: session?.user?.name || "",
     },
   });
-  res.json(order);
+  console.log(escrows)
+  res.json(escrows);
 }
