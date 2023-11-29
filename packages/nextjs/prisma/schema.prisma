@@ -46,6 +46,9 @@ model User {
     accounts      Account[]
     keys          APIKey[]
     orders        Order[]
+
+    maker Escrow[] @relation("maker")
+    taker Escrow[] @relation("taker")
 }
 
 model APIKey {
@@ -76,4 +79,21 @@ model Order {
     user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([userId])
+}
+
+model Escrow {
+    id                 Int       @id @default(autoincrement())
+    orderId            Int
+    makerId            String
+    takerId            String
+    escrowStatus       String
+    dealAmount         String
+    totalPriceExchange String
+    deadline           Int?
+    createdAt          DateTime  @default(now())
+    updatedAt          DateTime? @updatedAt
+    maker              User?     @relation("maker", fields: [makerId], references: [id], onDelete: Cascade)
+    taker              User?     @relation("taker", fields: [takerId], references: [id], onDelete: Cascade)
+
+    @@index([makerId, takerId])
 }
