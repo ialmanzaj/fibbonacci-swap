@@ -66,7 +66,7 @@ const Dropdown: React.FC<DropdownProps> = ({ label, name, items }) => {
 };
 
 interface BuyStepsProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 const BuySteps: React.FC<BuyStepsProps> = ({ children }) => {
