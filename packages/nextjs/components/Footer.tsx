@@ -4,6 +4,7 @@ import { HeartIcon } from "@heroicons/react/24/outline";
 import { SwitchTheme } from "~~/components/SwitchTheme";
 import { Faucet } from "~~/components/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
+import Link from "next/link";
 import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
 /**
@@ -29,7 +30,10 @@ export const Footer = () => {
         </div>
       </div>
       <div className="w-full">
-        <ul className="menu menu-horizontal w-full">
+        <ul className="menu menu-horizontal w-full justify-center">
+          <div className="btn btn-primary btn-sm font-normal cursor-auto my-4">
+            <Link href="/transactions">My transactions</Link>
+          </div>
           <div className="flex justify-center items-center gap-2 text-sm w-full">
             <span>·</span>
             <div>
