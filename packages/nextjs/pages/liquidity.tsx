@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { MetaHeader } from "~~/components/MetaHeader";
-import BelvoWidget from "~~/components/belvo/BelvoWidget";
 import { COP, USDT } from "~~/components/currencies";
 import BuyingSide from "~~/components/liquidity/buying";
 import SellingSide from "~~/components/liquidity/selling";
@@ -24,13 +23,9 @@ function Liquidity() {
           <SwapButtons isSelling={isSelling} setIsSelling={setIsSelling} />
 
           {isSelling ? (
-            <SellingSide currencyIn={USDT} currencyOut={COP}>
-              <BelvoWidget />
-            </SellingSide>
+            <SellingSide currencyIn={USDT} currencyOut={COP}></SellingSide>
           ) : (
-            <BuyingSide currencyIn={COP} currencyOut={USDT}>
-              <BelvoWidget />
-            </BuyingSide>
+            <BuyingSide currencyIn={COP} currencyOut={USDT}></BuyingSide>
           )}
         </div>
       </section>

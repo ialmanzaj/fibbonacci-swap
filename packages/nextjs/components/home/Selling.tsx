@@ -15,7 +15,7 @@ function Selling({ orders }: any) {
   const [isApproved, setIsApproved] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(orders[0]);
   const deadLine = getFutureTimeInUnix(new Date());
-  console.log(currentOrder);
+  const maker = currentOrder.user;
 
   const { data: FibbonacciEscrow } = useDeployedContractInfo("FibbonacciEscrow");
   const { data: Balloons } = useDeployedContractInfo("Balloons");
@@ -33,15 +33,35 @@ function Selling({ orders }: any) {
     args: [FibbonacciEscrow?.address, multiplyTo1e18(amountToSell)],
   });
 
-  const { writeAsync: escrowTokens } = useScaffoldContractWrite({
+  const escrowPayment = (): void => {
+    fetch("/api/escrow/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId: currentOrder.id,
+        dealAmount: multiplyTo1e18(amountToSell).toString(),
+        totalPriceExchange: currentOrder.priceTotalExchange,
+        makerId: currentOrder.user.id,
+        taker: connectedAddress,
+        deadline: getFutureTimeInUnix(new Date()),
+      }),
+    })
+      .then(response => response.json())
+      .then(data => data)
+      .catch(error => console.error("Error:", error));
+  };
+
+  const { writeAsync: escrowDeal } = useScaffoldContractWrite({
     contractName: "FibbonacciEscrow",
     functionName: "takeDeal",
     args: [
-      currentOrder.id,
+      BigNumber.from(currentOrder.id),
       multiplyTo1e18(amountToSell),
-      currentOrder.priceTotalExchange,
+      BigNumber.from(currentOrder.priceTotalExchange),
       BigNumber.from(deadLine),
-      "0x02C48c159FDfc1fC18BA0323D67061dE1dEA329F",
+      maker.address,
       Balloons?.address,
     ],
   });
@@ -88,8 +108,9 @@ function Selling({ orders }: any) {
             isApproved ? "block" : "hidden"
           }`}
           onClick={async () => {
-            await escrowTokens();
-            setIsApproved(false);
+            await escrowDeal();
+            await escrowPayment();
+            // setIsApproved(false);
           }}
         >
           Sell Tokens

@@ -36,6 +36,7 @@ const SellingSide: React.FC<SellingSideProps> = ({ children, currencyIn, currenc
   } = useForm<Inputs>({
     mode: "onChange",
   });
+  
   const onSubmit: SubmitHandler<Inputs> = async data => {
     console.log(data);
     await writeAsync({
