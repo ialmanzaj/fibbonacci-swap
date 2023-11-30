@@ -97,6 +97,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
     },
     // https://next-auth.js.org/configuration/providers/oauth
     providers,
+    adapter: PrismaAdapter(db),
     secret: process.env.NEXTAUTH_SECRET,
     session: {
       strategy: "jwt",

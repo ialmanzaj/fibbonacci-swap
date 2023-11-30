@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { belvoClient } from "~~/services/belvo";
 import { db } from "~~/services/db";
 
-export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { linkId, institution } = req.body;
   const session = await getServerAuthSession(req, res);
   if (!session) {
