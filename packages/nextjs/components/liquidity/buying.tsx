@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { Currency } from "../currencies";
 import { utils } from "ethers";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -19,7 +20,7 @@ type Inputs = {
   max: number;
 };
 
-function formatCurrency(amount: number, locale: string = "en-US", currency: string = "USD"): string {
+export function formatCurrency(amount: number, locale: string = "en-US", currency: string = "USD"): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency,
@@ -27,6 +28,7 @@ function formatCurrency(amount: number, locale: string = "en-US", currency: stri
 }
 
 const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyOut }) => {
+  const router = useRouter();
   const [total, setTotal] = useState("0");
   const [data, setData] = useState({
     amount: 0,
@@ -59,6 +61,7 @@ const BuyingSide: React.FC<BuyingSideProps> = ({ children, currencyIn, currencyO
       .then(response => response.json())
       .then(data => data)
       .catch(error => console.error("Error:", error));
+    router.push(`transactions/`);
   };
 
   useEffect(() => {
