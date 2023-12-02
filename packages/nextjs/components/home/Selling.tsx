@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { COP, USDT } from "../currencies";
 import SwapInput from "../main/SwapInput";
 import { BigNumber } from "ethers";
@@ -9,6 +10,7 @@ import { multiplyTo1e18 } from "~~/utils/scaffold-eth/priceInWei";
 import { getFutureTimeInUnix } from "~~/utils/scaffold-eth/time";
 
 function Selling({ orders }: any) {
+  const router = useRouter();
   const { address: connectedAddress } = useAccount();
   const [exchangedValue, setExchangedValue] = useState(0);
   const [amountToSell, setAmountToSell] = useState<string | BigNumber>("");
@@ -33,8 +35,8 @@ function Selling({ orders }: any) {
     args: [FibbonacciEscrow?.address, multiplyTo1e18(amountToSell)],
   });
 
-  const escrowPayment = (): void => {
-    fetch("/api/escrow/create", {
+  const escrowPayment = () => {
+    return fetch("/api/escrow/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,6 +67,12 @@ function Selling({ orders }: any) {
       Balloons?.address,
     ],
   });
+
+  const launchEscrow = async () => {
+    await escrowDeal();
+    const escrow = await escrowPayment();
+    router.push(`transactions/${escrow.id}`);
+  };
 
   useEffect(() => {
     if (amountToSell) {
@@ -108,8 +116,7 @@ function Selling({ orders }: any) {
             isApproved ? "block" : "hidden"
           }`}
           onClick={async () => {
-            await escrowDeal();
-            await escrowPayment();
+            launchEscrow();
             // setIsApproved(false);
           }}
         >

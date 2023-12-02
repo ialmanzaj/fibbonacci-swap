@@ -103,9 +103,9 @@ const BuySteps: React.FC<BuyStepsProps> = ({ children }) => {
                   <li className="text-left">
                     <a
                       className={`flex h-7 w-7 items-center justify-center rounded-full ${
-                        activeStep === 2
-                          ? "bg-gray-600 text-xs font-semibold text-white ring ring-gray-600 ring-offset-2"
-                          : "bg-gray-300 text-xs font-semibold text-white"
+                       
+                           "bg-gray-600 text-xs font-semibold text-white ring ring-gray-600 ring-offset-2"
+                         
                       }`}
                       href="#"
                     >
