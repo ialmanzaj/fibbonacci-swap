@@ -1,4 +1,4 @@
-# Decentralized P2P powered by Chainlink and Belvo
+# Decentralized P2P powered by Chainlink
 
 Fibbonacci-swap is a trustles fiat-to-crypto onramp/offramp powered by Chainlink and fintech APIs. 
 
